@@ -10,14 +10,21 @@ type SidebarContextType = {
 const SidebarContext = createContext<SidebarContextType | undefined>(undefined)
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(
-    typeof window !== "undefined" ? window.innerWidth >= 768 : true
-  )
+  // Changed initial state to false for consistency between server and client
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   useEffect(() => {
+    // On mount, open sidebar on desktop
+    if (window.innerWidth >= 768) {
+      setIsSidebarOpen(true)
+    }
+    
+    // Update on resize: open on desktop, close on mobile
     const handleResize = () => {
       if (window.innerWidth < 768) {
         setIsSidebarOpen(false)
+      } else {
+        setIsSidebarOpen(true)
       }
     }
 

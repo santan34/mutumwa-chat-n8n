@@ -2,7 +2,7 @@
 
 import { LanguageProvider } from "./contexts/LanguageContext"
 import { SidebarProvider } from "./contexts/SidebarContext"
-import Sidebar from "@/components/sidebar"
+import dynamic from "next/dynamic"
 import LanguagePicker from "@/components/language-picker"
 import { africanLanguages } from "@/lib/languages"
 import Image from "next/image"
@@ -10,17 +10,29 @@ import { useLanguage } from "./contexts/LanguageContext"
 import { useSidebar } from "./contexts/SidebarContext"
 import { ReactNode } from "react"
 import { Inter } from "next/font/google"
+import { Menu } from "lucide-react"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
+const Sidebar = dynamic(() => import("@/components/sidebar"), { ssr: false })
 
 function Header() {
   const { selectedLanguage, setSelectedLanguage } = useLanguage()
-  
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
+
   return (
     <div className="flex items-center justify-between border-b border-white/10 px-2 sm:px-4 py-2 sm:py-3">
-      <div className="flex items-center space-x-2 ml-10">
-        <div className="relative h-7 w-7 sm:h-8 sm:w-8 ml-2 sm:ml-10">
+      <div className="flex items-center space-x-2">
+        {/* Mobile menu button - shown only if sidebar is closed */}
+        {!isSidebarOpen && (
+          <button
+            onClick={() => setIsSidebarOpen(true)}
+            className="md:hidden "
+          >
+            <Menu className="h-8 w-8 text-white" />
+          </button>
+        )}
+        <div className="relative h-7 w-7 sm:h-8 sm:w-8 ml-2 ">
           <Image 
             src="/logo.png"
             alt="Alex AI Logo"

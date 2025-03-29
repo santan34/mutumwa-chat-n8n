@@ -35,16 +35,8 @@ export default function ChatMessages({
   if (messages.length === 0) {
     return (
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center text-center pt-16 px-2 lg:px-8">
-        <div className="md:hidden absolute top-4 left-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-            className="h-8 w-8 text-slate-400 hover:text-white"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-        </div>
+       
+  
 
         <div className="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(96,165,250,0.5)]">
           <span className="text-white text-3xl font-bold">A</span>
@@ -65,16 +57,8 @@ export default function ChatMessages({
 
   return (
     <div className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-8 space-y-4 pt-14">
-      <div className="md:hidden absolute top-4 left-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-          className="h-8 w-8 text-slate-400 hover:text-white"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
-      </div>
+     
+  
 
       <div className="max-w-3xl mx-auto w-full">
         {messages.map((message) => (
