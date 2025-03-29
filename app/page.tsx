@@ -23,11 +23,25 @@ export default function Home() {
   const [selectedLanguage, setSelectedLanguage] = useState(africanLanguages[0])
   const [sessionId, setSessionId] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true)
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   useEffect(() => {
     // Generate a session ID when the component mounts
     setSessionId(uuidv4())
+    
+    // Set sidebar open by default only on larger screens
+    const handleResize = () => {
+      setIsSidebarOpen(window.innerWidth >= 768) // 768px is md breakpoint in Tailwind
+    }
+    
+    // Set initial state
+    handleResize()
+    
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize)
+    
+    // Clean up event listener
+    return () => window.removeEventListener('resize', handleResize)
   }, [])
 
   const handleSendMessage = async (text: string) => {
@@ -112,10 +126,10 @@ export default function Home() {
       >
         <div className="flex h-full w-full flex-col p-2 md:px-10 md:py-2">
           {/* Chat container  */}
-          <div className="relative flex h-full w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
+          <div className="relative flex h-full max-h-[100vh] w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
             {/* Header with language picker */}
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-              <div className="flex items-center flex-1">
+            <div className="flex flex-col sm:flex-row items-center justify-between border-b border-white/10 px-4 py-3">
+              <div className="flex items-center justify-center w-full sm:justify-start sm:w-auto sm:flex-1">
                 <div className="relative h-8 w-8 mr-2">
                   <Image 
                     src="/logo.png"
@@ -132,6 +146,7 @@ export default function Home() {
                 selectedLanguage={selectedLanguage}
                 setSelectedLanguage={setSelectedLanguage}
                 languages={africanLanguages}
+         
               />
             </div>
             
@@ -143,12 +158,14 @@ export default function Home() {
                 selectedLanguage={selectedLanguage}
                 onSuggestionClick={handleSendMessage}
                 isSidebarOpen={isSidebarOpen}
-                setIsSidebarOpen={setIsSidebarOpen} suggestions={[]}              />
+                setIsSidebarOpen={setIsSidebarOpen} 
+                suggestions={[]}              
+              />
             </div>
             
             {/* Suggestion slider - only show when chat hasn't started */}
             {messages.length === 0 && (
-              <div className=" py-2 px-3 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              <div className="py-2 px-3 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 <div className="flex justify-center space-x-2">
                   {getLanguageSuggestions(selectedLanguage.value).map((suggestion, index) => (
                     <button
@@ -164,7 +181,7 @@ export default function Home() {
             )}
             
             {/* Chat input area with subtle separation */}
-            <div className="bg-transparent p-2 px-3 sm:p-3">
+            <div className="bg-transparent p-2 px-3 sm:p-3 sticky bottom-0">
               <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
             </div>
           </div>
