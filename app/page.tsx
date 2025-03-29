@@ -23,11 +23,22 @@ export default function Home() {
   const [selectedLanguage, setSelectedLanguage] = useState(africanLanguages[0])
   const [sessionId, setSessionId] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false) // Default to closed on mobile
+  const [isSidebarOpen, setIsSidebarOpen] = useState(
+    typeof window !== "undefined" ? window.innerWidth >= 768 : true
+  )
 
   useEffect(() => {
     // Generate a session ID when the component mounts
     setSessionId(uuidv4())
+
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setIsSidebarOpen(false)
+      }
+    }
+
+    window.addEventListener("resize", handleResize)
+    return () => window.removeEventListener("resize", handleResize)
   }, [])
 
   const handleSendMessage = async (text: string) => {
@@ -111,8 +122,8 @@ export default function Home() {
         className={`flex flex-1 flex-col transition-all duration-300 ${isSidebarOpen ? "md:pl-64" : "pl-0"} w-full`}
       >
         <div className="flex h-full w-full flex-col p-2 md:px-10 md:py-2">
-          {/* Chat container  */}
-          <div className="relative flex h-full w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
+          {/* Chat container - adjusted height for mobile */}
+          <div className="relative flex h-[calc(100vh-20px)] md:h-full w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
             {/* Header with language picker */}
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
               <div className="flex items-center space-x-2">
