@@ -121,13 +121,13 @@ export default function Home() {
       <div 
         className={`flex flex-1 flex-col transition-all duration-300 ${isSidebarOpen ? "md:pl-64" : "pl-0"} w-full`}
       >
-        <div className="flex h-full w-full flex-col p-2 md:px-10 md:py-2">
+        <div className="flex h-full w-full flex-col p-1 sm:p-2 md:px-10 md:py-2">
           {/* Chat container - adjusted height for mobile */}
-          <div className="relative flex h-[calc(100vh-80px)] md:h-[calc(100vh-20px)] w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
+          <div className="relative flex h-[calc(100vh-40px)] md:h-[calc(100vh-20px)] w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
             {/* Header with language picker */}
-            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
+            <div className="flex items-center justify-between border-b border-white/10 px-2 sm:px-4 py-2 sm:py-3">
               <div className="flex items-center space-x-2">
-                <div className="relative h-8 w-8 ml-10">
+                <div className="relative h-7 w-7 sm:h-8 sm:w-8 ml-2 sm:ml-10">
                   <Image 
                     src="/logo.png"
                     alt="Alex AI Logo"
@@ -135,11 +135,11 @@ export default function Home() {
                     className="object-contain"
                   />
                 </div>
-                <h2 className="text-lg font-medium text-white/90 truncate">
+                <h2 className="text-base sm:text-lg font-medium text-white/90 truncate">
                   Alex AI
                 </h2>
               </div>
-              <div className="flex-shrink-0 ml-4">
+              <div className="flex-shrink-0 ml-2 sm:ml-4">
                 <LanguagePicker
                   selectedLanguage={selectedLanguage}
                   setSelectedLanguage={setSelectedLanguage}
@@ -156,18 +156,20 @@ export default function Home() {
                 selectedLanguage={selectedLanguage}
                 onSuggestionClick={handleSendMessage}
                 isSidebarOpen={isSidebarOpen}
-                setIsSidebarOpen={setIsSidebarOpen} suggestions={[]}              />
+                setIsSidebarOpen={setIsSidebarOpen} 
+                suggestions={[]}              
+              />
             </div>
             
             {/* Suggestion slider - only show when chat hasn't started */}
             {messages.length === 0 && (
-              <div className=" py-2 px-3 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              <div className="py-2 px-2 sm:px-3 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 <div className="flex justify-center space-x-2">
                   {getLanguageSuggestions(selectedLanguage.value).map((suggestion, index) => (
                     <button
                       key={index}
                       onClick={() => handleSendMessage(suggestion)}
-                      className="px-3 py-1.5 rounded-full border border-white/20 hover:border-white/40 hover:text-white text-sm text-white/70 transition-all flex-shrink-0"
+                      className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/20 hover:border-white/40 hover:text-white text-xs sm:text-sm text-white/70 transition-all flex-shrink-0"
                     >
                       {suggestion}
                     </button>
@@ -177,7 +179,7 @@ export default function Home() {
             )}
             
             {/* Chat input area with subtle separation */}
-            <div className="bg-transparent p-2 px-3 sm:p-3">
+            <div className="bg-transparent p-1 sm:p-2 px-2 sm:px-3">
               <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
             </div>
           </div>
