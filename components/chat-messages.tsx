@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useRef, useEffect } from "react"
 import type { Language } from "@/lib/languages"
 import { Loader2, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -31,13 +31,17 @@ export default function ChatMessages({
   setIsSidebarOpen,
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  
+  // Add useEffect for auto-scrollings
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isLoading]);
 
   if (messages.length === 0) {
     return (
       <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center text-center pt-16 px-2 lg:px-8">
-       
-  
-
         <div className="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(96,165,250,0.5)]">
           <span className="text-white text-3xl font-bold">A</span>
         </div>
@@ -50,16 +54,12 @@ export default function ChatMessages({
           <span className="text-slate-400">Selected language: </span>
           <span className="text-white font-medium">{selectedLanguage.label}</span>
         </div>
-
       </div>
     )
   }
 
   return (
     <div className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-8 space-y-4 pt-14">
-     
-  
-
       <div className="max-w-3xl mx-auto w-full">
         {messages.map((message) => (
           <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} mb-4`}>
