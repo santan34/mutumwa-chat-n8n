@@ -1,17 +1,6 @@
 "use client"
 
-import { useRef, useEffect, useState, useCallback } from "react"
-
-// Simple debounce implementation
-function debounce<F extends (...args: any[]) => any>(func: F, wait: number): F {
-  let timeoutId: ReturnType<typeof setTimeout> | null = null;
-  return function(this: any, ...args: Parameters<F>) {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    timeoutId = setTimeout(() => func.apply(this, args), wait);
-  } as F;
-}
+import { useRef, useEffect } from "react"
 import type { Language } from "@/lib/languages"
 import { Loader2, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -42,70 +31,13 @@ export default function ChatMessages({
   setIsSidebarOpen,
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const messagesContainerRef = useRef<HTMLDivElement>(null)
-  const [isAtBottom, setIsAtBottom] = useState(true)
   
-  // Check if user is near bottom of container
-  const checkIfAtBottom = () => {
-    if (messagesContainerRef.current) {
-      const container = messagesContainerRef.current;
-      const threshold = 20; // smaller threshold for better UX
-      const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
-      setIsAtBottom(atBottom);
-      return atBottom;
-    }
-    return false;
-  };
-
-  // Scroll to bottom function with smooth behavior
-  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
-    if (messagesContainerRef.current) {
-      const container = messagesContainerRef.current;
-      container.scrollTo({
-        top: container.scrollHeight,
-        behavior
-      });
-    }
-  };
-
-  // Debounced scroll handler
-  const debouncedCheckIfAtBottom = debounce(checkIfAtBottom, 50);
-
-  // Add scroll event listener to track user position
+  // Add useEffect for auto-scrollings
   useEffect(() => {
-    const container = messagesContainerRef.current;
-    if (container) {
-      container.addEventListener('scroll', debouncedCheckIfAtBottom);
-      return () => container.removeEventListener('scroll', debouncedCheckIfAtBottom);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, []);
-
-  // Handle scroll behavior when messages change
-  useEffect(() => {
-    let rafId: number;
-    
-    const handleScroll = () => {
-      // Use requestAnimationFrame for smooth updates
-      rafId = requestAnimationFrame(() => {
-        const wasAtBottom = checkIfAtBottom();
-        if (wasAtBottom) {
-          scrollToBottom('auto'); // Use 'auto' for instant scroll when needed
-        }
-      });
-    };
-
-    // Initial check
-    handleScroll();
-
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-    };
   }, [messages, isLoading]);
-
-  // Scroll to bottom on initial load
-  useEffect(() => {
-    scrollToBottom();
-  }, []);
 
   if (messages.length === 0) {
     return (
@@ -127,45 +59,39 @@ export default function ChatMessages({
   }
 
   return (
-    <div className="flex-1 p-2 md:p-4 lg:p-8 pt-14 flex flex-col">
-      <div 
-        ref={messagesContainerRef}
-        className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent"
-      >
-        <div className="max-w-3xl mx-auto w-full">
-          {messages.map((message) => (
-            <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} mb-4`}>
-              <div
-                className={`max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 ${
-                  message.sender === "user"
-                    ? "bg-blue-500/80 backdrop-blur-sm text-white border border-blue-400/50 shadow-[0_0_10px_rgba(96,165,250,0.4)]"
-                    : "bg-slate-800/70 backdrop-blur-sm text-white border border-slate-700/50"
-                }`}
-              >
-                {message.sender === "user" ? message.text : <MarkdownRenderer content={message.text} />}
-              </div>
+    <div className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-8 space-y-4 pt-14">
+      <div className="max-w-3xl mx-auto w-full">
+        {messages.map((message) => (
+          <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} mb-4`}>
+            <div
+              className={`max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 ${
+                message.sender === "user"
+                  ? "bg-blue-500/80 backdrop-blur-sm text-white border border-blue-400/50 shadow-[0_0_10px_rgba(96,165,250,0.4)]"
+                  : "bg-slate-800/70 backdrop-blur-sm text-white border border-slate-700/50"
+              }`}
+            >
+              {message.sender === "user" ? message.text : <MarkdownRenderer content={message.text} />}
             </div>
-          ))}
+          </div>
+        ))}
 
-          {isLoading && (
-            <div className="flex justify-start mb-4">
-              <div className="max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 bg-slate-800/70 backdrop-blur-sm text-white border border-slate-700/50">
-                <div className="flex items-center">
-                  <span className="text-sm text-slate-300">Alex is typing</span>
-                  <div className="flex ml-2">
-                    <span className="h-2 w-2 bg-blue-300 rounded-full mr-1 animate-bounce shadow-[0_0_5px_rgba(147,197,253,0.7)]" style={{ animationDelay: "0ms" }}></span>
-                    <span className="h-2 w-2 bg-blue-300 rounded-full mr-1 animate-bounce shadow-[0_0_5px_rgba(147,197,253,0.7)]" style={{ animationDelay: "150ms" }}></span>
-                    <span className="h-2 w-2 bg-blue-300 rounded-full animate-bounce shadow-[0_0_5px_rgba(147,197,253,0.7)]" style={{ animationDelay: "300ms" }}></span>
-                  </div>
+        {isLoading && (
+          <div className="flex justify-start mb-4">
+            <div className="max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 bg-slate-800/70 backdrop-blur-sm text-white border border-slate-700/50">
+              <div className="flex items-center">
+                <span className="text-sm text-slate-300">Alex is typing</span>
+                <div className="flex ml-2">
+                  <span className="h-2 w-2 bg-blue-300 rounded-full mr-1 animate-bounce shadow-[0_0_5px_rgba(147,197,253,0.7)]" style={{ animationDelay: "0ms" }}></span>
+                  <span className="h-2 w-2 bg-blue-300 rounded-full mr-1 animate-bounce shadow-[0_0_5px_rgba(147,197,253,0.7)]" style={{ animationDelay: "150ms" }}></span>
+                  <span className="h-2 w-2 bg-blue-300 rounded-full animate-bounce shadow-[0_0_5px_rgba(147,197,253,0.7)]" style={{ animationDelay: "300ms" }}></span>
                 </div>
               </div>
             </div>
-          )}
+          </div>
+        )}
 
-          <div ref={messagesEndRef} />
-        </div>
+        <div ref={messagesEndRef} />
       </div>
     </div>
   )
 }
-

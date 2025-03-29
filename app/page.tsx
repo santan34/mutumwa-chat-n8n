@@ -22,6 +22,7 @@ export default function Home() {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   const [sessionId, setSessionId] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [newMessageSent, setNewMessageSent] = useState(false)
 
   useEffect(() => {
     // Generate a session ID when the component mounts
@@ -42,6 +43,7 @@ export default function Home() {
         timestamp: new Date(),
       },
     ])
+    setNewMessageSent(true)
 
     setIsLoading(true)
 
