@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { v4 as uuidv4 } from "uuid"
+import Image from "next/image"
 import ChatMessages from "@/components/chat-messages"
 import ChatInput from "@/components/chat-input"
 import Sidebar from "@/components/sidebar"
@@ -114,9 +115,19 @@ export default function Home() {
           <div className="relative flex h-full w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
             {/* Header with language picker */}
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-              <h2 className="flex-1 text-center text-lg font-medium text-white/90">
-                Alex AI
-              </h2>
+              <div className="flex items-center flex-1">
+                <div className="relative h-8 w-8 mr-2">
+                  <Image 
+                    src="/logo.png"
+                    alt="Alex AI Logo"
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <h2 className="text-lg font-medium text-white/90">
+                  Alex AI
+                </h2>
+              </div>
               <LanguagePicker
                 selectedLanguage={selectedLanguage}
                 setSelectedLanguage={setSelectedLanguage}
