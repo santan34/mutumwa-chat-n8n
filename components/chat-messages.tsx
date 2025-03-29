@@ -98,7 +98,14 @@ export default function ChatMessages({
         {isLoading && (
           <div className="flex justify-start mb-4">
             <div className="max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 bg-slate-800/70 backdrop-blur-sm text-white border border-slate-700/50">
-              <Loader2 className="h-5 w-5 animate-spin" />
+              <div className="flex items-center">
+                <span className="text-sm text-slate-300">Alex is typing</span>
+                <div className="flex ml-2">
+                  <span className="h-2 w-2 bg-blue-400 rounded-full mr-1 animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                  <span className="h-2 w-2 bg-blue-400 rounded-full mr-1 animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                  <span className="h-2 w-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                </div>
+              </div>
             </div>
           </div>
         )}
