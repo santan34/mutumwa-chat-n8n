@@ -33,8 +33,13 @@ export default function ChatMessages({
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    // Auto scrolling disabled to prevent UI break on mobile
-    // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    const container = messagesEndRef.current?.parentElement
+    if (!container) return
+    const threshold = 50 // px
+    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight
+    if (distanceFromBottom < threshold) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    }
   }, [messages])
 
   if (messages.length === 0) {
