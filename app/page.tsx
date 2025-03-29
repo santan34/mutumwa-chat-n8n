@@ -123,7 +123,7 @@ export default function Home() {
       >
         <div className="flex h-full w-full flex-col p-2 md:px-10 md:py-2">
           {/* Chat container - adjusted height for mobile */}
-          <div className="relative flex h-[calc(100vh-20px)] md:h-full w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
+          <div className="relative flex h-[calc(100vh-80px)] md:h-[calc(100vh-20px)] w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
             {/* Header with language picker */}
             <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
               <div className="flex items-center space-x-2">
