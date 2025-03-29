@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useRef } from "react"
 import type { Language } from "@/lib/languages"
 import { Loader2, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -31,16 +31,6 @@ export default function ChatMessages({
   setIsSidebarOpen,
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const container = messagesEndRef.current?.parentElement
-    if (!container) return
-    const threshold = 50 // px
-    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight
-    if (distanceFromBottom < threshold) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-    }
-  }, [messages])
 
   if (messages.length === 0) {
     return (
