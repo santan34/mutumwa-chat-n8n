@@ -153,7 +153,7 @@ export default function Home() {
             )}
             
             {/* Chat input area with subtle separation */}
-            <div className="border-t border-white/10 bg-white/5 p-2 px-3 sm:p-3">
+            <div className="border-t border-white/10 bg-transparent p-2 px-3 sm:p-3">
               <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
             </div>
           </div>

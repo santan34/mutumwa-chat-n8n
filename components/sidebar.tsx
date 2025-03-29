@@ -17,11 +17,11 @@ export default function Sidebar({ onNewChat, isOpen, setIsOpen }: SidebarProps) 
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-50 h-full w-64 bg-slate-800 border-r border-slate-700/50 flex flex-col transition-transform duration-300 md:translate-x-0 ${
+        className={`fixed top-0 left-0 z-50 h-full w-64 bg-gradient-to-b from-indigo-950/90 to-slate-900/90 backdrop-blur-lg border-r border-white/10 flex flex-col transition-transform duration-300 md:translate-x-0 ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex items-center justify-between p-4 border-b border-slate-700/50">
+        <div className="flex items-center justify-between p-4 border-b border-white/10">
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-lg">
               A
@@ -45,7 +45,7 @@ export default function Sidebar({ onNewChat, isOpen, setIsOpen }: SidebarProps) 
           </Button>
         </div>
 
-        <div className="p-3 border-t border-slate-700/50 mt-auto">
+        <div className="p-3 border-t border-white/10 mt-auto">
           <div className="mt-4 text-xs text-slate-400 text-center">
             <p>© 2025 Alex</p>
             <p>Your African Language Assistant</p>

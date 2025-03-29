@@ -50,7 +50,7 @@ export default function ChatMessages({
           </Button>
         </div>
 
-        <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+        <div className="w-16 h-16 bg-blue-400 rounded-full flex items-center justify-center mb-4 shadow-[0_0_15px_rgba(96,165,250,0.5)]">
           <span className="text-white text-3xl font-bold">A</span>
         </div>
         <h2 className="text-2xl font-bold text-white mb-2">Welcome to Alex</h2>
@@ -86,7 +86,7 @@ export default function ChatMessages({
             <div
               className={`max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 ${
                 message.sender === "user"
-                  ? "bg-blue-600/90 backdrop-blur-sm text-white"
+                  ? "bg-blue-500/80 backdrop-blur-sm text-white border border-blue-400/50 shadow-[0_0_10px_rgba(96,165,250,0.4)]"
                   : "bg-slate-800/70 backdrop-blur-sm text-white border border-slate-700/50"
               }`}
             >
@@ -101,9 +101,9 @@ export default function ChatMessages({
               <div className="flex items-center">
                 <span className="text-sm text-slate-300">Alex is typing</span>
                 <div className="flex ml-2">
-                  <span className="h-2 w-2 bg-blue-400 rounded-full mr-1 animate-bounce" style={{ animationDelay: "0ms" }}></span>
-                  <span className="h-2 w-2 bg-blue-400 rounded-full mr-1 animate-bounce" style={{ animationDelay: "150ms" }}></span>
-                  <span className="h-2 w-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+                  <span className="h-2 w-2 bg-blue-300 rounded-full mr-1 animate-bounce shadow-[0_0_5px_rgba(147,197,253,0.7)]" style={{ animationDelay: "0ms" }}></span>
+                  <span className="h-2 w-2 bg-blue-300 rounded-full mr-1 animate-bounce shadow-[0_0_5px_rgba(147,197,253,0.7)]" style={{ animationDelay: "150ms" }}></span>
+                  <span className="h-2 w-2 bg-blue-300 rounded-full animate-bounce shadow-[0_0_5px_rgba(147,197,253,0.7)]" style={{ animationDelay: "300ms" }}></span>
                 </div>
               </div>
             </div>
