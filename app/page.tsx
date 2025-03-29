@@ -118,12 +118,12 @@ export default function Home() {
       
       <Sidebar onNewChat={handleNewChat} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
 
-      <div 
-        className={`flex flex-1 flex-col transition-all duration-300 ${isSidebarOpen ? "md:pl-64" : "pl-0"} w-full`}
+      <div
+        className={`flex flex-1 flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? "md:pl-64" : "pl-0"} w-full`}
       >
-        <div className="flex h-full w-full flex-col p-1 sm:p-2 md:px-10 md:py-2">
+        <div className="flex h-full w-full flex-col p-1.5 sm:p-2 md:px-10 md:py-2">
           {/* Chat container - adjusted height for mobile */}
-          <div className="relative flex h-[calc(100vh-40px)] md:h-[calc(100vh-20px)] w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
+          <div className="relative flex h-[calc(100dvh-48px)] md:h-[calc(100vh-20px)] w-full flex-col overflow-hidden rounded-xl border border-white/10 bg-white/5 backdrop-blur-lg shadow-xl">
             {/* Header with language picker */}
             <div className="flex items-center justify-between border-b border-white/10 px-2 sm:px-4 py-2 sm:py-3">
               <div className="flex items-center space-x-2">
@@ -148,8 +148,8 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Chat messages area */}
-            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-b from-slate-900/20 to-transparent">
+            {/* Chat messages area - improved mobile scrolling */}
+            <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-b from-slate-900/20 to-transparent">
               <ChatMessages
                 messages={messages}
                 isLoading={isLoading}
@@ -161,15 +161,15 @@ export default function Home() {
               />
             </div>
             
-            {/* Suggestion slider - only show when chat hasn't started */}
+            {/* Suggestion slider - improved mobile touch targets */}
             {messages.length === 0 && (
-              <div className="py-2 px-2 sm:px-3 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                <div className="flex justify-center space-x-2">
+              <div className="py-2.5 px-3 sm:px-4 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+                <div className="flex justify-center space-x-3">
                   {getLanguageSuggestions(selectedLanguage.value).map((suggestion, index) => (
                     <button
                       key={index}
                       onClick={() => handleSendMessage(suggestion)}
-                      className="px-2 sm:px-3 py-1 sm:py-1.5 rounded-full border border-white/20 hover:border-white/40 hover:text-white text-xs sm:text-sm text-white/70 transition-all flex-shrink-0"
+                      className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-full border border-white/20 hover:border-white/40 hover:text-white text-sm sm:text-[0.925rem] text-white/80 transition-all flex-shrink-0 active:scale-95"
                     >
                       {suggestion}
                     </button>
@@ -178,8 +178,8 @@ export default function Home() {
               </div>
             )}
             
-            {/* Chat input area with subtle separation */}
-            <div className="bg-transparent p-1 sm:p-2 px-2 sm:px-3">
+            {/* Chat input area - improved mobile spacing */}
+            <div className="bg-transparent p-2 sm:p-3 px-3 sm:px-4">
               <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
             </div>
           </div>
