@@ -1,6 +1,17 @@
 "use client"
 
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState, useCallback } from "react"
+
+// Simple debounce implementation
+function debounce<F extends (...args: any[]) => any>(func: F, wait: number): F {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null;
+  return function(this: any, ...args: Parameters<F>) {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => func.apply(this, args), wait);
+  } as F;
+}
 import type { Language } from "@/lib/languages"
 import { Loader2, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -32,14 +43,69 @@ export default function ChatMessages({
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const [isAtBottom, setIsAtBottom] = useState(true)
   
-  // Update the useEffect to scroll the container properly
-  useEffect(() => {
-    if (messagesEndRef.current && messagesContainerRef.current) {
+  // Check if user is near bottom of container
+  const checkIfAtBottom = () => {
+    if (messagesContainerRef.current) {
       const container = messagesContainerRef.current;
-      container.scrollTop = container.scrollHeight;
+      const threshold = 20; // smaller threshold for better UX
+      const atBottom = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+      setIsAtBottom(atBottom);
+      return atBottom;
     }
+    return false;
+  };
+
+  // Scroll to bottom function with smooth behavior
+  const scrollToBottom = (behavior: ScrollBehavior = 'smooth') => {
+    if (messagesContainerRef.current) {
+      const container = messagesContainerRef.current;
+      container.scrollTo({
+        top: container.scrollHeight,
+        behavior
+      });
+    }
+  };
+
+  // Debounced scroll handler
+  const debouncedCheckIfAtBottom = debounce(checkIfAtBottom, 50);
+
+  // Add scroll event listener to track user position
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', debouncedCheckIfAtBottom);
+      return () => container.removeEventListener('scroll', debouncedCheckIfAtBottom);
+    }
+  }, []);
+
+  // Handle scroll behavior when messages change
+  useEffect(() => {
+    let rafId: number;
+    
+    const handleScroll = () => {
+      // Use requestAnimationFrame for smooth updates
+      rafId = requestAnimationFrame(() => {
+        const wasAtBottom = checkIfAtBottom();
+        if (wasAtBottom) {
+          scrollToBottom('auto'); // Use 'auto' for instant scroll when needed
+        }
+      });
+    };
+
+    // Initial check
+    handleScroll();
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId);
+    };
   }, [messages, isLoading]);
+
+  // Scroll to bottom on initial load
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
 
   if (messages.length === 0) {
     return (
