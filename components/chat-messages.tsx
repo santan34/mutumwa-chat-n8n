@@ -32,10 +32,16 @@ export default function ChatMessages({
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
-  // Add useEffect for auto-scrollings
+  // Auto-scroll to bottom of messages container
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      const container = messagesEndRef.current.parentElement?.parentElement;
+      if (container) {
+        container.scrollTo({
+          top: messagesEndRef.current.offsetTop,
+          behavior: 'smooth'
+        });
+      }
     }
   }, [messages, isLoading]);
 
