@@ -30,18 +30,15 @@ export default function ChatMessages({
   isSidebarOpen,
   setIsSidebarOpen,
 }: ChatMessagesProps) {
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+   
   // Auto-scroll to bottom of messages container
   useEffect(() => {
-    if (messagesEndRef.current) {
-      const container = messagesEndRef.current.parentElement?.parentElement;
-      if (container) {
-        container.scrollTo({
-          top: messagesEndRef.current.offsetTop,
-          behavior: 'smooth'
-        });
-      }
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [messages, isLoading]);
 
@@ -96,7 +93,8 @@ export default function ChatMessages({
           </div>
         )}
 
-        <div ref={messagesEndRef} />
+        {/* Empty div to track end of messages */}
+        <div />
       </div>
     </div>
   )
