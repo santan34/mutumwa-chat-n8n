@@ -6,6 +6,12 @@ interface MarkdownRendererProps {
   content: string
 }
 
+// Add this interface for code component props
+interface CodeProps extends React.HTMLAttributes<HTMLElement> {
+  inline?: boolean;
+  node?: any;
+}
+
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
     <ReactMarkdown
@@ -21,7 +27,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
         a: ({ node, ...props }) => (
           <a className="text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer" {...props} />
         ),
-        code: ({ node, inline, ...props }) =>
+        code: ({ node, inline, ...props }: CodeProps) =>
           inline ? (
             <code className="bg-slate-800 px-1 py-0.5 rounded text-sm" {...props} />
           ) : (

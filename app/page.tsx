@@ -96,12 +96,12 @@ export default function Home() {
   }
 
   return (
-    <main className="relative flex h-screen w-screen overflow-hidden bg-gradient-to-br from-indigo-950/90 via-slate-900/80 to-slate-950/90">
+    <main className="relative flex h-screen w-screen overflow-hidden bg-gradient-to-br from-indigo-950/95 via-slate-900/90 to-slate-950/95">
       {/* Background decorative elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-blue-600/10 blur-3xl"></div>
-        <div className="absolute right-0 top-1/4 h-60 w-60 rounded-full bg-indigo-500/10 blur-3xl"></div>
-        <div className="absolute bottom-0 left-1/3 h-60 w-60 rounded-full bg-purple-600/10 blur-3xl"></div>
+        <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-blue-800/15 blur-3xl"></div>
+        <div className="absolute right-0 top-1/4 h-60 w-60 rounded-full bg-indigo-700/15 blur-3xl"></div>
+        <div className="absolute bottom-0 left-1/3 h-60 w-60 rounded-full bg-purple-800/15 blur-3xl"></div>
       </div>
       
       <Sidebar onNewChat={handleNewChat} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
@@ -137,7 +137,7 @@ export default function Home() {
             
             {/* Suggestion slider - only show when chat hasn't started */}
             {messages.length === 0 && (
-              <div className="border-t border-white/10 py-2 px-3 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              <div className=" py-2 px-3 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
                 <div className="flex justify-center space-x-2">
                   {getLanguageSuggestions(selectedLanguage.value).map((suggestion, index) => (
                     <button
@@ -153,7 +153,7 @@ export default function Home() {
             )}
             
             {/* Chat input area with subtle separation */}
-            <div className="border-t border-white/10 bg-transparent p-2 px-3 sm:p-3">
+            <div className="bg-transparent p-2 px-3 sm:p-3">
               <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
             </div>
           </div>
