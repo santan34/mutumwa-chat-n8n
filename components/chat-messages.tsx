@@ -33,7 +33,8 @@ export default function ChatMessages({
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    // Auto scrolling disabled to prevent UI break on mobile
+    // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages])
 
   if (messages.length === 0) {
