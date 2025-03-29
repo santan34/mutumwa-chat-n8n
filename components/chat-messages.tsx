@@ -1,0 +1,111 @@
+"use client"
+
+import { useEffect, useRef } from "react"
+import type { Language } from "@/lib/languages"
+import { Loader2, Menu } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import MarkdownRenderer from "@/components/markdown-renderer"
+
+interface ChatMessagesProps {
+  messages: Array<{
+    id: string
+    text: string
+    sender: "user" | "assistant"
+    timestamp: Date
+  }>
+  isLoading: boolean
+  selectedLanguage: Language
+  suggestions: string[]
+  onSuggestionClick: (text: string) => void
+  isSidebarOpen: boolean
+  setIsSidebarOpen: (isOpen: boolean) => void
+}
+
+export default function ChatMessages({
+  messages,
+  isLoading,
+  selectedLanguage,
+  suggestions,
+  onSuggestionClick,
+  isSidebarOpen,
+  setIsSidebarOpen,
+}: ChatMessagesProps) {
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+  }, [messages])
+
+  if (messages.length === 0) {
+    return (
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col items-center justify-center text-center pt-16 px-2 lg:px-8">
+        <div className="md:hidden absolute top-4 left-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+            className="h-8 w-8 text-slate-400 hover:text-white"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        </div>
+
+        <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mb-4">
+          <span className="text-white text-3xl font-bold">A</span>
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">Welcome to Alex</h2>
+        <p className="text-slate-400 max-w-md lg:max-w-lg">
+          Your AI assistant that speaks African languages. Start a conversation and experience the power of multilingual
+          communication.
+        </p>
+        <div className="mt-6 px-4 py-2 bg-slate-800/50 backdrop-blur-sm rounded-lg text-sm border border-slate-700/50">
+          <span className="text-slate-400">Selected language: </span>
+          <span className="text-white font-medium">{selectedLanguage.label}</span>
+        </div>
+
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex-1 overflow-y-auto p-2 md:p-4 lg:p-8 space-y-4 pt-14">
+      <div className="md:hidden absolute top-4 left-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+          className="h-8 w-8 text-slate-400 hover:text-white"
+        >
+          <Menu className="h-5 w-5" />
+        </Button>
+      </div>
+
+      <div className="max-w-3xl mx-auto w-full">
+        {messages.map((message) => (
+          <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} mb-4`}>
+            <div
+              className={`max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 ${
+                message.sender === "user"
+                  ? "bg-blue-600/90 backdrop-blur-sm text-white"
+                  : "bg-slate-800/70 backdrop-blur-sm text-white border border-slate-700/50"
+              }`}
+            >
+              {message.sender === "user" ? message.text : <MarkdownRenderer content={message.text} />}
+            </div>
+          </div>
+        ))}
+
+        {isLoading && (
+          <div className="flex justify-start mb-4">
+            <div className="max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 bg-slate-800/70 backdrop-blur-sm text-white border border-slate-700/50">
+              <Loader2 className="h-5 w-5 animate-spin" />
+            </div>
+          </div>
+        )}
+
+        <div ref={messagesEndRef} />
+      </div>
+    </div>
+  )
+}
+
