@@ -53,8 +53,8 @@ export default function Home() {
       formData.append("targetLanguage", selectedLanguage.value)
       formData.append("sessionId", sessionId)
 
-      // Send request to the webhook
-      const response = await fetch("https://n8n.afrainity.com/webhook-test/243a5832-b26a-4070-adbb-d32cb8f7efa0", {
+      // Send request to the webhook using environment variable
+      const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_URL || "", {
         method: "POST",
         body: formData,
       })
