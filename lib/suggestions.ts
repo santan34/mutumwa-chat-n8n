@@ -8,6 +8,9 @@ export function getLanguageSuggestions(languageCode: string): string[] {
   ]
 
   const languageSpecificSuggestions: Record<string, string[]> = {
+    english: ["Hello, how are you?", "Can you help me?", "I'd like to learn about your culture", "What's your favorite food?", "Tell me about yourself"],
+    ndebele: ["Kunjani?", "Ungangisiza?", "Ngifuna ukufunda isiNdebele"],
+    portuguese: ["Olá, como está?", "Pode me ajudar?", "Gostaria de aprender sobre a sua cultura", "Qual é a sua comida favorita?", "Fale-me sobre você"],
     shona: ["Makadii henyu?", "Mungandibatsirawo here?", "Ndingada kuziva nezvetsika dzechiShona"],
     swahili: ["Habari yako?", "Unaweza kunisaidia?", "Ningependa kujifunza Kiswahili"],
     amharic: ["ሰላም እንደምን ነህ?", "እባክህ ልትረዳኝ ትችላለህ?", "ስለ ኢትዮጵያ ባህል ንገረኝ"],
@@ -18,6 +21,16 @@ export function getLanguageSuggestions(languageCode: string): string[] {
     xhosa: ["Molo, unjani?", "Ungandinceda?", "Ndifuna ukufunda isiXhosa"],
     afrikaans: ["Hallo, hoe gaan dit?", "Kan jy my help?", "Ek wil graag Afrikaans leer"],
     twi: ["Ɛte sɛn?", "Wobɛtumi aboa me?", "Mepɛ sɛ mesua Twi kasa"],
+    oromo: ["Akkam jirta?", "Na gargaaruu dandeessaa?", "Afaan Oromoo barachuu barbaada"],
+    somali: ["Iska waran?", "Ma i caawin kartaa?", "Waxaan rabaa inaan barto Af Soomaali"],
+    tigrinya: ["ሰላም፣ ከመይ ኣለኻ?", "ክትሕግዘኒ ትኽእል ዶ?", "ትግርኛ ክመሃር እደሊ"],
+    bambara: ["I ni ce/sogoma", "I bɛ se ka n dɛmɛ wa?", "N b'a fɛ ka Bamanankan kalan"],
+    lingala: ["Mbote, ozali malamu?", "Okoki kosunga ngai?", "Nalingi koyekola Lingala"],
+    kinyarwanda: ["Muraho, amakuru?", "Washobora kumfasha?", "Ndashaka kwiga Kinyarwanda"],
+    wolof: ["Na nga def?", "Ndax mën nga ma dimbali?", "Dama bëgg jàng Wolof"],
+    malagasy: ["Manao ahoana ianao?", "Afaka manampy ahy ve ianao?", "Te-hianatra fiteny Malagasy aho"],
+    fulani: ["Jam waali?", "A waawi wallitde kam?", "Miɗo yiɗi ekkitaade Fulfulde"],
+    
   }
 
   // Return language-specific suggestions if available, otherwise return common suggestions

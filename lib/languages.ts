@@ -4,6 +4,9 @@ export interface Language {
 }
 
 export const africanLanguages: Language[] = [
+  { label: "English", value: "english" },
+  { label: "Ndebele (isiNdebele)", value: "ndebele" },
+  { label: "Portuguese (Português)", value: "portuguese" },
   { label: "Shona (chiShona)", value: "shona" },
   { label: "Swahili (Kiswahili)", value: "swahili" },
   { label: "Amharic (አማርኛ)", value: "amharic" },
@@ -23,6 +26,6 @@ export const africanLanguages: Language[] = [
   { label: "Wolof", value: "wolof" },
   { label: "Malagasy", value: "malagasy" },
   { label: "Fulani (Fulfulde)", value: "fulani" },
-  { label: "Ndebele (isiNdebele)", value: "ndebele" },
+  
 ]
 
