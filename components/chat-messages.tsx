@@ -32,10 +32,10 @@ export default function ChatMessages({
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
   
-  // Add useEffect for auto-scrollings
+  // Improved scrolling behavior for mobile
   useEffect(() => {
     if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
     }
   }, [messages, isLoading]);
 
@@ -59,8 +59,8 @@ export default function ChatMessages({
   }
 
   return (
-    <div className="flex-1 overflow-y-auto overscroll-none -webkit-overflow-scrolling: touch p-2 md:p-4 lg:p-8 space-y-4 pt-14">
-      <div className="max-w-3xl mx-auto w-full">
+    <div className="flex-1 overflow-y-auto overscroll-none h-full pb-4 pt-14 px-2 md:p-4 lg:p-8">
+      <div className="max-w-3xl mx-auto w-full relative">
         {messages.map((message) => (
           <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} mb-4`}>
             <div
@@ -90,7 +90,7 @@ export default function ChatMessages({
           </div>
         )}
 
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} className="h-1" />
       </div>
     </div>
   )
