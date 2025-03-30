@@ -93,7 +93,7 @@ export default function Home() {
   return (
     <>
       {/* Chat messages area - improved mobile touch handling */}
-      <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-b from-slate-900/20 to-transparent">
+      <div className="flex-1 overflow-y-auto overscroll-none -webkit-overflow-scrolling: touch touch-pan-y scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-b from-slate-900/20 to-transparent h-full max-h-full">
         <ChatMessages
           messages={messages}
           isLoading={isLoading}
@@ -107,7 +107,7 @@ export default function Home() {
       
       {/* Suggestion slider - only show when chat hasn't started */}
       {messages.length === 0 && (
-        <div className="py-2.5 px-3 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+        <div className="py-2.5 px-3 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent flex-shrink-0">
           <div className="flex justify-center space-x-3">
             {getLanguageSuggestions(selectedLanguage.value).map((suggestion, index) => (
               <button
@@ -123,7 +123,7 @@ export default function Home() {
       )}
       
       {/* Chat input area */}
-      <div className="bg-transparent p-2 px-3 sm:px-4">
+      <div className="bg-transparent p-2 px-3 sm:px-4 flex-shrink-0">
         <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
       </div>
     </>
