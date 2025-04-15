@@ -26,7 +26,7 @@ export default function Sidebar({ onNewChat, isOpen, setIsOpen }: SidebarProps) 
             <div className="flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-lg">
               A
             </div>
-            <h1 className="text-lg font-bold text-white">Alex</h1>
+            <h1 className="text-lg font-bold text-white">Mutumwa</h1>
           </div>
           <Button
             variant="ghost"
@@ -47,7 +47,7 @@ export default function Sidebar({ onNewChat, isOpen, setIsOpen }: SidebarProps) 
 
         <div className="p-3 border-t border-white/10 mt-auto">
           <div className="mt-4 text-xs text-slate-400 text-center">
-            <p>© 2025 Alex</p>
+            <p>© 2025 Mutumwa</p>
             <p>Your African Language Assistant</p>
           </div>
         </div>

@@ -35,13 +35,13 @@ function Header() {
         <div className="relative h-7 w-7 sm:h-8 sm:w-8 ml-2 ">
           <Image 
             src="/logo.png"
-            alt="Alex AI Logo"
+            alt="Mutumwa AI Logo"
             fill
             className="object-contain"
           />
         </div>
         <h2 className="text-base sm:text-lg font-medium text-white/90 truncate">
-          Alex AI
+          Mutumwa AI
         </h2>
       </div>
       <div className="flex-shrink-0 ml-2 sm:ml-4">
