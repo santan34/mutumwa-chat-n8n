@@ -4,20 +4,14 @@ import { useState, useEffect } from "react"
 import { v4 as uuidv4 } from "uuid"
 import ChatMessages from "@/components/chat-messages"
 import ChatInput from "@/components/chat-input"
+import LandingPage from "@/components/landing-page"
 import { getLanguageSuggestions } from "@/lib/suggestions"
 import { useLanguage } from "./contexts/LanguageContext"
 import { useSidebar } from "./contexts/SidebarContext"
+import { useApp } from "./contexts/AppContext"
 
 export default function Home() {
-  const [messages, setMessages] = useState<
-    Array<{
-      id: string
-      text: string
-      sender: "user" | "assistant"
-      timestamp: Date
-    }>
-  >([])
-
+  const { showLanding, setShowLanding, messages, setMessages } = useApp()
   const { selectedLanguage } = useLanguage()
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   const [sessionId, setSessionId] = useState("")
@@ -28,8 +22,16 @@ export default function Home() {
     // Generate a session ID when the component mounts
     setSessionId(uuidv4())
   }, [])
+  const handleGetStarted = () => {
+    setShowLanding(false)
+  }
 
   const handleSendMessage = async (text: string) => {
+    // If this is the first message, hide landing page
+    if (showLanding) {
+      setShowLanding(false)
+    }
+
     if (!text.trim()) return
 
     // Add user message to the chat
@@ -87,7 +89,11 @@ export default function Home() {
       ])
     } finally {
       setIsLoading(false)
-    }
+    }  }
+
+  // Show landing page if no messages and showLanding is true
+  if (showLanding && messages.length === 0) {
+    return <LandingPage onGetStarted={handleGetStarted} />
   }
 
   return (

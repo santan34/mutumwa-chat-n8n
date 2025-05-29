@@ -2,8 +2,10 @@
 
 import { LanguageProvider } from "./contexts/LanguageContext"
 import { SidebarProvider } from "./contexts/SidebarContext"
+import { AppProvider, useApp } from "./contexts/AppContext"
 import dynamic from "next/dynamic"
 import LanguagePicker from "@/components/language-picker"
+import { Button } from "@/components/ui/button"
 import { africanLanguages } from "@/lib/languages"
 import Image from "next/image"
 import { useLanguage } from "./contexts/LanguageContext"
@@ -43,8 +45,18 @@ function Header() {
         <h2 className="text-base sm:text-lg font-medium text-white/90 truncate">
           Mutumwa AI
         </h2>
-      </div>
-      <div className="flex-shrink-0 ml-2 sm:ml-4">
+      </div>      <div className="flex items-center gap-2 flex-shrink-0 ml-2 sm:ml-4">
+        <Button 
+          asChild
+          variant="ghost"
+          size="sm"
+          className="text-slate-300 hover:text-white hover:bg-slate-800/50 backdrop-blur-sm hidden sm:flex"
+        >
+          <a href="https://mutdash.afrainity.com/" target="_blank" rel="noopener noreferrer">
+            Dashboard
+          </a>
+        </Button>
+        
         <LanguagePicker
           selectedLanguage={selectedLanguage}
           setSelectedLanguage={setSelectedLanguage}
@@ -57,15 +69,18 @@ function Header() {
 
 function AppLayout({ children }: { children: ReactNode }) {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
+  const { showLanding, resetApp } = useApp()
 
   const handleNewChat = () => {
-    // We'll implement this with a context or pass it as a prop
-    // For now, we're just stubbing it
-    window.location.href = '/'
+    resetApp()
   }
 
+  // If on landing page, render children directly without layout wrapper
+  if (showLanding) {
+    return <>{children}</>
+  }
   return (
-    <div className="relative flex h-screen w-screen overflow-hidden bg-gradient-to-br from-indigo-950/95 via-slate-900/90 to-slate-950/95">
+    <div className="relative flex h-screen w-screen overflow-hidden bg-gradient-to-br from-indigo-950/95 via-slate-900/90 to-slate-950/95" data-chat-layout>
       {/* Background decorative elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-blue-800/15 blur-3xl"></div>
@@ -98,11 +113,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SidebarProvider>
-          <LanguageProvider>
-            <AppLayout>{children}</AppLayout>
-          </LanguageProvider>
-        </SidebarProvider>
+        <AppProvider>
+          <SidebarProvider>
+            <LanguageProvider>
+              <AppLayout>{children}</AppLayout>
+            </LanguageProvider>
+          </SidebarProvider>
+        </AppProvider>
       </body>
     </html>
   )

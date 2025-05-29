@@ -1,6 +1,6 @@
 "use client"
 
-import { X, Plus } from "lucide-react"
+import { X, Plus, Globe } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 interface SidebarProps {
@@ -36,12 +36,21 @@ export default function Sidebar({ onNewChat, isOpen, setIsOpen }: SidebarProps) 
           >
             <X className="h-5 w-5" />
           </Button>
-        </div>
-
-        <div className="p-3">
-          <Button onClick={onNewChat} className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700">
+        </div>        <div className="p-3">
+          <Button onClick={onNewChat} className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 mb-3">
             <Plus className="h-4 w-4" />
             <span>New Chat</span>
+          </Button>
+          
+          <Button 
+            asChild
+            variant="outline"
+            className="w-full flex items-center gap-2 border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800/50"
+          >
+            <a href="https://mutdash.afrainity.com/" target="_blank" rel="noopener noreferrer">
+              <Globe className="h-4 w-4" />
+              <span>Dashboard</span>
+            </a>
           </Button>
         </div>
 

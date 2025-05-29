@@ -65,12 +65,16 @@
 body {
   @apply bg-background text-foreground;
   font-feature-settings: "rlig" 1, "calt" 1;
-  overflow: hidden;
   min-height: 100vh;
   min-height: 100dvh;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
+}
+
+/* Hide overflow only when in chat mode, not on landing page */
+body:has([data-chat-layout]) {
+  overflow: hidden;
 }
 
 ::-webkit-scrollbar {
@@ -112,5 +116,18 @@ body {
 /* Smooth scrolling for all devices */
 html {
   scroll-behavior: smooth;
+}
+
+/* Landing page specific optimizations */
+[data-landing-page] {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Ensure smooth scrolling on mobile */
+@supports (-webkit-overflow-scrolling: touch) {
+  [data-landing-page] {
+    transform: translate3d(0, 0, 0);
+  }
 }
 
