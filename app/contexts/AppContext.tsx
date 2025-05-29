@@ -15,6 +15,7 @@ type AppContextType = {
   messages: Message[]
   setMessages: (messages: Message[] | ((prev: Message[]) => Message[])) => void
   resetApp: () => void
+  startNewChat: () => void
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
@@ -28,8 +29,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setMessages([])
   }
 
+  const startNewChat = () => {
+    setMessages([])
+    // Don't reset showLanding when starting a new chat
+  }
   return (
-    <AppContext.Provider value={{ showLanding, setShowLanding, messages, setMessages, resetApp }}>
+    <AppContext.Provider value={{ showLanding, setShowLanding, messages, setMessages, resetApp, startNewChat }}>
       {children}
     </AppContext.Provider>
   )

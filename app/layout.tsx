@@ -69,10 +69,10 @@ function Header() {
 
 function AppLayout({ children }: { children: ReactNode }) {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
-  const { showLanding, resetApp } = useApp()
+  const { showLanding, startNewChat } = useApp()
 
   const handleNewChat = () => {
-    resetApp()
+    startNewChat()
   }
 
   // If on landing page, render children directly without layout wrapper
