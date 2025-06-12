@@ -81,16 +81,7 @@ export default function Sidebar({
             <span>New Chat</span>
           </Button>
           
-          <Button 
-            asChild
-            variant="outline"
-            className="w-full flex items-center gap-2 border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800/50 mb-4"
-          >
-            <a href="https://mutdash.afrainity.com/" target="_blank" rel="noopener noreferrer">
-              <Globe className="h-4 w-4" />
-              <span>Dashboard</span>
-            </a>
-          </Button>
+          
         </div>
 
         {/* Chat History */}

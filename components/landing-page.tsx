@@ -95,15 +95,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
             
-            <Button 
-              asChild
-              variant="outline"
-              className="border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800/50 backdrop-blur-sm"
-            >
-              <a href="https://mutdash.afrainity.com/" target="_blank" rel="noopener noreferrer">
-                Dashboard
-              </a>
-            </Button>
+            
           </div>
         </div>
       </header>
@@ -295,6 +287,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
           </p>
         </div>
       </footer>
+      <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
     </div>
   )
 }

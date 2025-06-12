@@ -41,12 +41,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setSessions(storedSessions)
     
     // Create test sessions if none exist (for debugging)
-    if (storedSessions.length === 0) {
-      console.log("No sessions found, creating test sessions")
-      SessionManager.createTestSessions()
-      const testSessions = SessionManager.getAllSessions()
-      setSessions(testSessions)
-    }
+   
     
     // Generate initial session ID
     const existingSessionId = SessionManager.getCurrentSessionId()

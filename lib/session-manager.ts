@@ -182,35 +182,4 @@ export class SessionManager {
     localStorage.removeItem(CURRENT_SESSION_KEY)
   }
 
-  // Create test sessions for debugging
-  static createTestSessions(): void {
-    if (typeof window === "undefined") return
-    
-    const testSessions: ChatSession[] = [
-      {
-        id: "test-session-1",
-        title: "Hello, how are you?",
-        lastMessage: "Hello, how are you?",
-        timestamp: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
-        messageCount: 3
-      },
-      {
-        id: "test-session-2", 
-        title: "What's the weather like today?",
-        lastMessage: "What's the weather like today?",
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
-        messageCount: 5
-      },
-      {
-        id: "test-session-3",
-        title: "Tell me about African culture",
-        lastMessage: "Tell me about African culture",
-        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
-        messageCount: 8
-      }
-    ]
-    
-    this.saveSessions(testSessions)
-    console.log("Test sessions created:", testSessions)
-  }
 }
