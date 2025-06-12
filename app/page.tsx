@@ -6,22 +6,18 @@ import ChatMessages from "@/components/chat-messages"
 import ChatInput from "@/components/chat-input"
 import LandingPage from "@/components/landing-page"
 import { getLanguageSuggestions } from "@/lib/suggestions"
+import { SessionManager } from "@/lib/session-manager"
 import { useLanguage } from "./contexts/LanguageContext"
 import { useSidebar } from "./contexts/SidebarContext"
 import { useApp } from "./contexts/AppContext"
 
 export default function Home() {
-  const { showLanding, setShowLanding, messages, setMessages } = useApp()
+  const { showLanding, setShowLanding, messages, setMessages, currentSessionId, refreshSessions } = useApp()
   const { selectedLanguage } = useLanguage()
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
-  const [sessionId, setSessionId] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [newMessageSent, setNewMessageSent] = useState(false)
 
-  useEffect(() => {
-    // Generate a session ID when the component mounts
-    setSessionId(uuidv4())
-  }, [])
   const handleGetStarted = () => {
     setShowLanding(false)
   }
@@ -32,9 +28,7 @@ export default function Home() {
       setShowLanding(false)
     }
 
-    if (!text.trim()) return
-
-    // Add user message to the chat
+    if (!text.trim()) return    // Add user message to the chat
     const userMessageId = uuidv4()
     setMessages((prev) => [
       ...prev,
@@ -47,14 +41,17 @@ export default function Home() {
     ])
     setNewMessageSent(true)
 
+    // Update session storage with the new message
+    SessionManager.updateSessionWithMessage(currentSessionId, text, true)
+    refreshSessions()
+
     setIsLoading(true)
 
-    try {
-      // Create form data for the request
+    try {      // Create form data for the request
       const formData = new FormData()
       formData.append("text", text)
       formData.append("targetLanguage", selectedLanguage.value)
-      formData.append("sessionId", sessionId)
+      formData.append("sessionId", currentSessionId)
 
       // Send request to the webhook using environment variable
       const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_URL || "", {

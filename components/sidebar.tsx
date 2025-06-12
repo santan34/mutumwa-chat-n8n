@@ -1,15 +1,37 @@
 "use client"
 
-import { X, Plus, Globe } from "lucide-react"
+import { X, Plus, Globe, MessageSquare, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ChatSession } from "@/lib/session-manager"
+import { formatDistanceToNow } from "date-fns"
+import { useState } from "react"
 
 interface SidebarProps {
   onNewChat: () => void
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
+  sessions: ChatSession[]
+  currentSessionId: string
+  onLoadSession: (sessionId: string) => void
+  onDeleteSession: (sessionId: string) => void
 }
 
-export default function Sidebar({ onNewChat, isOpen, setIsOpen }: SidebarProps) {
+export default function Sidebar({ 
+  onNewChat, 
+  isOpen, 
+  setIsOpen, 
+  sessions, 
+  currentSessionId, 
+  onLoadSession, 
+  onDeleteSession 
+}: SidebarProps) {
+  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
+
+  const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
+    e.stopPropagation()
+    onDeleteSession(sessionId)
+    setDeletingSessionId(null)
+  }
   return (
     <>
       {/* Mobile overlay */}
@@ -45,13 +67,59 @@ export default function Sidebar({ onNewChat, isOpen, setIsOpen }: SidebarProps) 
           <Button 
             asChild
             variant="outline"
-            className="w-full flex items-center gap-2 border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800/50"
+            className="w-full flex items-center gap-2 border-slate-600 text-slate-300 hover:text-white hover:bg-slate-800/50 mb-4"
           >
             <a href="https://mutdash.afrainity.com/" target="_blank" rel="noopener noreferrer">
               <Globe className="h-4 w-4" />
               <span>Dashboard</span>
             </a>
           </Button>
+        </div>
+
+        {/* Chat History */}
+        <div className="flex-1 overflow-y-auto px-3">
+          <div className="text-xs text-slate-400 mb-2 px-2">Recent Chats</div>
+          <div className="space-y-1">
+            {sessions.length === 0 ? (
+              <div className="text-xs text-slate-500 text-center py-4 px-2">
+                No previous chats
+              </div>
+            ) : (
+              sessions.map((session) => (
+                <div
+                  key={session.id}
+                  className={`group relative p-2 rounded-lg cursor-pointer transition-colors ${
+                    session.id === currentSessionId
+                      ? "bg-blue-600/20 border border-blue-400/30"
+                      : "hover:bg-slate-800/50"
+                  }`}
+                  onClick={() => onLoadSession(session.id)}
+                >
+                  <div className="flex items-start gap-2">
+                    <MessageSquare className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm text-white truncate mb-1">
+                        {session.title}
+                      </div>
+                      <div className="text-xs text-slate-400 truncate">
+                        {session.lastMessage}
+                      </div>
+                      <div className="text-xs text-slate-500 mt-1">
+                        {formatDistanceToNow(session.timestamp, { addSuffix: true })}
+                      </div>
+                    </div>
+                    <button
+                      onClick={(e) => handleDeleteSession(session.id, e)}
+                      className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 transition-all"
+                      title="Delete chat"
+                    >
+                      <Trash2 className="h-3 w-3 text-red-400" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
         </div>
 
         <div className="p-3 border-t border-white/10 mt-auto">

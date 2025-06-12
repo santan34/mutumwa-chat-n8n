@@ -69,10 +69,18 @@ function Header() {
 
 function AppLayout({ children }: { children: ReactNode }) {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
-  const { showLanding, startNewChat } = useApp()
+  const { showLanding, startNewChat, sessions, currentSessionId, loadSession, deleteSession } = useApp()
 
   const handleNewChat = () => {
     startNewChat()
+  }
+
+  const handleLoadSession = async (sessionId: string) => {
+    await loadSession(sessionId)
+  }
+
+  const handleDeleteSession = (sessionId: string) => {
+    deleteSession(sessionId)
   }
 
   // If on landing page, render children directly without layout wrapper
@@ -88,7 +96,15 @@ function AppLayout({ children }: { children: ReactNode }) {
         <div className="absolute bottom-0 left-1/3 h-60 w-60 rounded-full bg-purple-800/15 blur-3xl"></div>
       </div>
       
-      <Sidebar onNewChat={handleNewChat} isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+      <Sidebar 
+        onNewChat={handleNewChat} 
+        isOpen={isSidebarOpen} 
+        setIsOpen={setIsSidebarOpen}
+        sessions={sessions}
+        currentSessionId={currentSessionId}
+        onLoadSession={handleLoadSession}
+        onDeleteSession={handleDeleteSession}
+      />
 
       <div
         className={`flex flex-1 flex-col transition-all duration-300 ease-in-out ${isSidebarOpen ? "md:pl-64" : "pl-0"} w-full`}
