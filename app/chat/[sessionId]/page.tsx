@@ -127,9 +127,16 @@ export default function ChatPage() {
 
   if (!isSessionLoaded) {
     return (
+      <>
       <div className="flex-1 flex items-center justify-center">
         <div className="text-white">Loading chat...</div>
       </div>
+        {/* Chat input area */}
+      <div className="bg-transparent p-2 px-3 sm:px-4 flex-shrink-0">
+        <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
+      </div>
+      </>
+      
     )
   }
 
