@@ -8,15 +8,13 @@ import ChatInput from "@/components/chat-input"
 import { getLanguageSuggestions } from "@/lib/suggestions"
 import { SessionManager } from "@/lib/session-manager"
 import { useLanguage } from "../../contexts/LanguageContext"
-import { useSidebar } from "../../contexts/SidebarContext"
 import { useApp } from "../../contexts/AppContext"
 
 export default function ChatPage() {
   const params = useParams()
   const router = useRouter()
   const sessionId = params.sessionId as string
-  
-  const { 
+    const { 
     messages, 
     setMessages, 
     loadSessionFromUrl, 
@@ -24,7 +22,6 @@ export default function ChatPage() {
     setCurrentSessionId 
   } = useApp()
   const { selectedLanguage } = useLanguage()
-  const { isSidebarOpen, setIsSidebarOpen } = useSidebar()  ;
   const [isLoading, setIsLoading] = useState(false)
   const [isSessionLoaded, setIsSessionLoaded] = useState(false)
   const [loadedSessionId, setLoadedSessionId] = useState<string | null>(null)
@@ -139,14 +136,11 @@ export default function ChatPage() {
   return (
     <>
       {/* Chat messages area */}
-      <div className="flex-1 overflow-y-auto overscroll-none -webkit-overflow-scrolling: touch touch-pan-y scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-b from-slate-900/20 to-transparent h-full max-h-full">
-        <ChatMessages
+      <div className="flex-1 overflow-y-auto overscroll-none -webkit-overflow-scrolling: touch touch-pan-y scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-b from-slate-900/20 to-transparent h-full max-h-full">        <ChatMessages
           messages={messages}
           isLoading={isLoading}
           selectedLanguage={selectedLanguage}
           onSuggestionClick={handleSendMessage}
-          isSidebarOpen={isSidebarOpen}
-          setIsSidebarOpen={setIsSidebarOpen} 
           suggestions={[]}              
         />
       </div>

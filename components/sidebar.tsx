@@ -4,7 +4,7 @@ import { X, Plus, Globe, MessageSquare, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ChatSession } from "@/lib/session-manager"
 import { formatDistanceToNow } from "date-fns"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
 interface SidebarProps {
@@ -34,15 +34,20 @@ export default function Sidebar({
     onDeleteSession(sessionId)
     setDeletingSessionId(null)
   }
-
   const handleNewChat = () => {
     router.push("/chat/new")
-    setIsOpen(false) // Close sidebar on mobile after navigation
+    // Only close sidebar on mobile after navigation
+    if (window.innerWidth < 768) {
+      setIsOpen(false)
+    }
   }
 
   const handleLoadSession = (sessionId: string) => {
     router.push(`/chat/${sessionId}`)
-    setIsOpen(false) // Close sidebar on mobile after navigation
+    // Only close sidebar on mobile after navigation
+    if (window.innerWidth < 768) {
+      setIsOpen(false)
+    }
   }
   return (
     <>

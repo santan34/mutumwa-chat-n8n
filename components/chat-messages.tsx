@@ -5,6 +5,7 @@ import type { Language } from "@/lib/languages"
 import { Loader2, Menu } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import MarkdownRenderer from "@/components/markdown-renderer"
+import { useSidebar } from "@/app/contexts/SidebarContext"
 
 interface ChatMessagesProps {
   messages: Array<{
@@ -17,8 +18,6 @@ interface ChatMessagesProps {
   selectedLanguage: Language
   suggestions: string[]
   onSuggestionClick: (text: string) => void
-  isSidebarOpen: boolean
-  setIsSidebarOpen: (isOpen: boolean) => void
 }
 
 export default function ChatMessages({
@@ -27,10 +26,9 @@ export default function ChatMessages({
   selectedLanguage,
   suggestions,
   onSuggestionClick,
-  isSidebarOpen,
-  setIsSidebarOpen,
 }: ChatMessagesProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
   
   // Improved scrolling behavior for mobile
   useEffect(() => {
