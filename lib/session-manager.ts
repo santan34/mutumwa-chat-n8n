@@ -24,8 +24,7 @@ export interface ChatSession {
   messageCount: number
 }
 
-const ZEP_API_BASE = "https://api.getzep.com/api/v2"
-const ZEP_API_KEY = "z_1dWlkIjoiNTI3OGYyZDAtZDc2Ny00ZDk4LTgyNzItNmJjZTY4ZGZkYmY5In0.pq9UvrIRaLs-YQzmby2GBBcA1x631J-7Z2DpUrN0tlgeVO0w79bPQlOZcluMSIJMhxf5HF5Ze155An0S83I6sw"
+// Removed direct API constants - now handled by API routes
 
 // Local storage keys
 const SESSIONS_STORAGE_KEY = "mutumwa_chat_sessions"
@@ -90,19 +89,14 @@ export class SessionManager {
     if (typeof window === "undefined") return
     localStorage.setItem(CURRENT_SESSION_KEY, sessionId)
   }
-
-  // Fetch messages from Zep API
+  // Fetch messages from Zep API via our Next.js API route
   static async fetchSessionMessages(sessionId: string): Promise<ZepMessage[]> {
     try {
-      const response = await fetch(`${ZEP_API_BASE}/sessions/${sessionId}/messages`, {
-        headers: {
-          'Authorization': `Api-Key ${ZEP_API_KEY}`,
-          'Content-Type': 'application/json'
-        }
-      })
+      const response = await fetch(`/api/sessions/${sessionId}/messages`)
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch messages: ${response.statusText}`)
+        console.warn(`Failed to fetch messages: ${response.statusText}`)
+        return []
       }
 
       const data: ZepSessionResponse = await response.json()
@@ -112,6 +106,33 @@ export class SessionManager {
     } catch (error) {
       console.error("Error fetching session messages:", error)
       return []
+    }
+  }
+
+  // Add a message to Zep session via our Next.js API route
+  static async addMessageToSession(sessionId: string, content: string, role: 'user' | 'assistant'): Promise<boolean> {
+    try {
+      const response = await fetch(`/api/sessions/${sessionId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          role,
+          content
+        })
+      })
+
+      if (!response.ok) {
+        console.warn(`Failed to add message to Zep: ${response.statusText}`)
+        return false
+      }
+
+      console.log(`Message added to Zep session ${sessionId}`)
+      return true
+    } catch (error) {
+      console.error("Error adding message to Zep session:", error)
+      return false
     }
   }
 

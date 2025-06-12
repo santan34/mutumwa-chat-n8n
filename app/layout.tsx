@@ -13,6 +13,7 @@ import { useSidebar } from "./contexts/SidebarContext"
 import { ReactNode } from "react"
 import { Inter } from "next/font/google"
 import { Menu } from "lucide-react"
+import { usePathname } from "next/navigation"
 import "./globals.css"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -69,10 +70,14 @@ function Header() {
 
 function AppLayout({ children }: { children: ReactNode }) {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
-  const { showLanding, startNewChat, sessions, currentSessionId, loadSession, deleteSession } = useApp()
+  const { sessions, currentSessionId, loadSession, deleteSession } = useApp()
+  const pathname = usePathname()
+
+  // Check if we're on a chat route
+  const isChatRoute = pathname.startsWith('/chat')
 
   const handleNewChat = () => {
-    startNewChat()
+    // This will be handled by the sidebar's router navigation
   }
 
   const handleLoadSession = async (sessionId: string) => {
@@ -83,8 +88,8 @@ function AppLayout({ children }: { children: ReactNode }) {
     deleteSession(sessionId)
   }
 
-  // If on landing page, render children directly without layout wrapper
-  if (showLanding) {
+  // If not on a chat route, render children directly (landing page)
+  if (!isChatRoute) {
     return <>{children}</>
   }
   return (

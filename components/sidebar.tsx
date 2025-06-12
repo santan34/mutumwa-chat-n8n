@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ChatSession } from "@/lib/session-manager"
 import { formatDistanceToNow } from "date-fns"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 
 interface SidebarProps {
   onNewChat: () => void
@@ -26,11 +27,22 @@ export default function Sidebar({
   onDeleteSession 
 }: SidebarProps) {
   const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
+  const router = useRouter()
 
   const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation()
     onDeleteSession(sessionId)
     setDeletingSessionId(null)
+  }
+
+  const handleNewChat = () => {
+    router.push("/chat/new")
+    setIsOpen(false) // Close sidebar on mobile after navigation
+  }
+
+  const handleLoadSession = (sessionId: string) => {
+    router.push(`/chat/${sessionId}`)
+    setIsOpen(false) // Close sidebar on mobile after navigation
   }
   return (
     <>
@@ -59,7 +71,7 @@ export default function Sidebar({
             <X className="h-5 w-5" />
           </Button>
         </div>        <div className="p-3">
-          <Button onClick={onNewChat} className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 mb-3">
+          <Button onClick={handleNewChat} className="w-full flex items-center gap-2 bg-blue-600 hover:bg-blue-700 mb-3">
             <Plus className="h-4 w-4" />
             <span>New Chat</span>
           </Button>
@@ -87,13 +99,12 @@ export default function Sidebar({
             ) : (
               sessions.map((session) => (
                 <div
-                  key={session.id}
-                  className={`group relative p-2 rounded-lg cursor-pointer transition-colors ${
+                  key={session.id}                  className={`group relative p-2 rounded-lg cursor-pointer transition-colors ${
                     session.id === currentSessionId
                       ? "bg-blue-600/20 border border-blue-400/30"
                       : "hover:bg-slate-800/50"
                   }`}
-                  onClick={() => onLoadSession(session.id)}
+                  onClick={() => handleLoadSession(session.id)}
                 >
                   <div className="flex items-start gap-2">
                     <MessageSquare className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
