@@ -124,19 +124,69 @@ export default function ChatPage() {
       setIsLoading(false)
     }
   }
+  // Chat skeleton component for loading state
+  const ChatSkeleton = () => (
+    <div className="flex-1 overflow-y-auto overscroll-none h-full pb-4 pt-14 px-2 md:p-4 lg:p-8">
+      <div className="max-w-3xl mx-auto w-full relative">    
+            {/* Skeleton messages */}
+        {[
+          { lines: [{ width: 'w-4/5' }, { width: 'w-3/5' }], size: 'w-[70%] md:w-[60%]' },
+          { lines: [{ width: 'w-full' }, { width: 'w-5/6' }, { width: 'w-2/3' }], size: 'w-[90%] md:w-[75%]' },
+          { lines: [{ width: 'w-3/4' }], size: 'w-[45%] md:w-[35%]' },
+          { lines: [{ width: 'w-full' }, { width: 'w-4/5' }, { width: 'w-3/5' }, { width: 'w-1/2' }], size: 'w-[85%] md:w-[70%]' },
+        ].map((message, index) => (
+          <div key={index} className={`flex ${index % 2 === 0 ? "justify-end" : "justify-start"} mb-4`}>
+            <div
+              className={`${message.size} lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 ${
+                index % 2 === 0
+                  ? "bg-blue-500/20 border border-blue-400/20"
+                  : "bg-slate-800/30 border border-slate-700/20"
+              }`}
+            >
+              <div className="animate-pulse">
+                {message.lines.map((line, lineIndex) => (
+                  <div 
+                    key={lineIndex} 
+                    className={`h-4 bg-white/10 rounded ${line.width} ${lineIndex < message.lines.length - 1 ? 'mb-2' : ''}`}
+                  ></div>
+                ))}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Typing indicator skeleton */}
+        <div className="flex justify-start mb-4">
+          <div className="max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 bg-slate-800/30 border border-slate-700/20">
+            <div className="flex items-center">
+              <span className="text-sm text-slate-400/60">Loading conversation...</span>
+              <div className="flex ml-2">
+                <span className="h-2 w-2 bg-blue-300/40 rounded-full mr-1 animate-bounce" style={{ animationDelay: "0ms" }}></span>
+                <span className="h-2 w-2 bg-blue-300/40 rounded-full mr-1 animate-bounce" style={{ animationDelay: "150ms" }}></span>
+                <span className="h-2 w-2 bg-blue-300/40 rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
 
   if (!isSessionLoaded) {
     return (
       <>
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-white">Loading chat...</div>
-      </div>
+        {/* Chat skeleton area */}
+        <div className="flex-1 overflow-y-auto overscroll-none -webkit-overflow-scrolling: touch touch-pan-y scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent bg-gradient-to-b from-slate-900/20 to-transparent h-full max-h-full">
+          <ChatSkeleton />
+        </div>
+        
+       
+        
         {/* Chat input area */}
-      <div className="bg-transparent p-2 px-3 sm:px-4 flex-shrink-0">
-        <ChatInput onSendMessage={handleSendMessage} isLoading={isLoading} />
-      </div>
+        <div className="bg-transparent p-2 px-3 sm:px-4 flex-shrink-0">
+          <ChatInput onSendMessage={handleSendMessage} isLoading={true} />
+        </div>
       </>
-      
     )
   }
 
