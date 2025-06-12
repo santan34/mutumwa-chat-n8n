@@ -32,20 +32,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([])
   const [currentSessionId, setCurrentSessionId] = useState("")
   const [sessions, setSessions] = useState<ChatSession[]>([])
-
   // Load sessions from localStorage on mount
   useEffect(() => {
     const storedSessions = SessionManager.getAllSessions()
+    console.log("Loading sessions from localStorage:", storedSessions)
     setSessions(storedSessions)
+    
+    // Create test sessions if none exist (for debugging)
+    if (storedSessions.length === 0) {
+      console.log("No sessions found, creating test sessions")
+      SessionManager.createTestSessions()
+      const testSessions = SessionManager.getAllSessions()
+      setSessions(testSessions)
+    }
     
     // Generate initial session ID
     const existingSessionId = SessionManager.getCurrentSessionId()
     if (existingSessionId) {
       setCurrentSessionId(existingSessionId)
+      console.log("Using existing session ID:", existingSessionId)
     } else {
       const newSessionId = uuidv4()
       setCurrentSessionId(newSessionId)
       SessionManager.setCurrentSessionId(newSessionId)
+      console.log("Created new session ID:", newSessionId)
     }
   }, [])
 
@@ -98,8 +108,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       startNewChat()
     }
   }
+
   const refreshSessions = () => {
     const storedSessions = SessionManager.getAllSessions()
+    console.log("Refreshing sessions:", storedSessions)
     setSessions(storedSessions)
   }
 

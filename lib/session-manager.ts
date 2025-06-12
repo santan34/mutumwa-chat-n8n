@@ -64,6 +64,7 @@ export class SessionManager {
 
   // Add or update a session
   static saveSession(session: ChatSession): void {
+    console.log("Saving session:", session)
     const sessions = this.getAllSessions()
     const existingIndex = sessions.findIndex(s => s.id === session.id)
     
@@ -105,6 +106,8 @@ export class SessionManager {
       }
 
       const data: ZepSessionResponse = await response.json()
+      console.log("Fetched messages:", data.messages)
+      // Convert Zep messages to our format
       return data.messages || []
     } catch (error) {
       console.error("Error fetching session messages:", error)
@@ -118,17 +121,18 @@ export class SessionManager {
     const title = firstMessage.trim().slice(0, 50)
     return title.length < firstMessage.trim().length ? `${title}...` : title
   }
-
   // Update session with new message info
   static updateSessionWithMessage(sessionId: string, message: string, isUser: boolean): void {
     if (isUser) {
       const sessions = this.getAllSessions()
-      const existingSession = sessions.find(s => s.id === sessionId)
+      const existingIndex = sessions.findIndex(s => s.id === sessionId)
       
-      if (existingSession) {
-        existingSession.lastMessage = message
-        existingSession.timestamp = new Date()
-        existingSession.messageCount += 1
+      if (existingIndex >= 0) {
+        // Update existing session
+        sessions[existingIndex].lastMessage = message
+        sessions[existingIndex].timestamp = new Date()
+        sessions[existingIndex].messageCount += 1
+        this.saveSessions(sessions)
       } else {
         // Create new session
         const newSession: ChatSession = {
@@ -140,8 +144,6 @@ export class SessionManager {
         }
         this.saveSession(newSession)
       }
-      
-      this.saveSessions(sessions)
     }
   }
 
@@ -157,5 +159,37 @@ export class SessionManager {
     if (typeof window === "undefined") return
     localStorage.removeItem(SESSIONS_STORAGE_KEY)
     localStorage.removeItem(CURRENT_SESSION_KEY)
+  }
+
+  // Create test sessions for debugging
+  static createTestSessions(): void {
+    if (typeof window === "undefined") return
+    
+    const testSessions: ChatSession[] = [
+      {
+        id: "test-session-1",
+        title: "Hello, how are you?",
+        lastMessage: "Hello, how are you?",
+        timestamp: new Date(Date.now() - 1000 * 60 * 60), // 1 hour ago
+        messageCount: 3
+      },
+      {
+        id: "test-session-2", 
+        title: "What's the weather like today?",
+        lastMessage: "What's the weather like today?",
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24), // 1 day ago
+        messageCount: 5
+      },
+      {
+        id: "test-session-3",
+        title: "Tell me about African culture",
+        lastMessage: "Tell me about African culture",
+        timestamp: new Date(Date.now() - 1000 * 60 * 60 * 24 * 2), // 2 days ago
+        messageCount: 8
+      }
+    ]
+    
+    this.saveSessions(testSessions)
+    console.log("Test sessions created:", testSessions)
   }
 }
