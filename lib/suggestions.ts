@@ -30,7 +30,9 @@ export function getLanguageSuggestions(languageCode: string): string[] {
     wolof: ["Na nga def?", "Ndax mën nga ma dimbali?", "Dama bëgg jàng Wolof"],
     malagasy: ["Manao ahoana ianao?", "Afaka manampy ahy ve ianao?", "Te-hianatra fiteny Malagasy aho"],
     fulani: ["Jam waali?", "A waawi wallitde kam?", "Miɗo yiɗi ekkitaade Fulfulde"],
-    dutch: ["Hallo, hoe gaat het?", "Kun je me helpen?", "Ik wil graag meer leren over jouw cultuur", "Wat is jouw favoriete eten?", "Vertel me iets over jezelf"],
+    chewa: ["Muli bwanji?", "Mungandithandize?", "Ndifuna kuphunzira Chichewa"],
+    nyanja: ["Muli bwanji?", "Mungandithandize?", "Ndifuna kuphunzira Chinyanja"],
+    dutch: ["Hallo, hoe gaat het?", "Kun je me helpen?", "Ik wil graag meer leren over jouw kultuur", "Wat is jouw favoriete eten?", "Vertel me iets over jezelf"],
   }
 
   // Return language-specific suggestions if available, otherwise return common suggestions

@@ -26,6 +26,8 @@ export const africanLanguages: Language[] = [
   { label: "Portuguese (Português)", value: "portuguese" },
   { label: "Malagasy", value: "malagasy" },
   { label: "Fulani (Fulfulde)", value: "fulani" },
+  { label: "Chewa (Chichewa)", value: "chewa" },
+  { label: "Nyanja (Chinyanja)", value: "nyanja" },
   { label: "English", value: "english" },
   
 ]
