@@ -37,7 +37,7 @@ function Header() {
         )}
         <div className="relative h-7 w-7 sm:h-8 sm:w-8 ml-2 ">
           <Image 
-            src="/logo.png"
+            src="/mutumwa-nobg-high-res.png"
             alt="Mutumwa AI Logo"
             fill
             className="object-contain"
@@ -93,11 +93,11 @@ function AppLayout({ children }: { children: ReactNode }) {
     return <>{children}</>
   }
   return (
-    <div className="relative flex h-screen w-screen overflow-hidden bg-gradient-to-br from-indigo-950/95 via-slate-900/90 to-slate-950/95" data-chat-layout>
+    <div className="relative flex h-screen w-screen overflow-hidden bg-gradient-to-br from-purple-950/95 via-slate-900/90 to-purple-950/95" data-chat-layout>
       {/* Background decorative elements */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-blue-800/15 blur-3xl"></div>
-        <div className="absolute right-0 top-1/4 h-60 w-60 rounded-full bg-indigo-700/15 blur-3xl"></div>
+        <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-purple-800/15 blur-3xl"></div>
+        <div className="absolute right-0 top-1/4 h-60 w-60 rounded-full bg-violet-700/15 blur-3xl"></div>
         <div className="absolute bottom-0 left-1/3 h-60 w-60 rounded-full bg-purple-800/15 blur-3xl"></div>
       </div>
       
