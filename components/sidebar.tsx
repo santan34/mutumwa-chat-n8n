@@ -2,37 +2,51 @@
 
 import { X, Plus, Globe, MessageSquare, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { ChatSession } from "@/lib/session-manager"
+import { ChatSession, SessionManager } from "@/lib/session-manager"
 import { formatDistanceToNow } from "date-fns"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 
 interface SidebarProps {
-  onNewChat: () => void
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
-  sessions: ChatSession[]
-  currentSessionId: string
-  onLoadSession: (sessionId: string) => void
-  onDeleteSession: (sessionId: string) => void
+  currentSessionId: string | null
+  onNewChat: () => void
 }
 
-export default function Sidebar({ 
-  onNewChat, 
-  isOpen, 
-  setIsOpen, 
-  sessions, 
-  currentSessionId, 
-  onLoadSession, 
-  onDeleteSession 
+export default function Sidebar({
+  isOpen,
+  setIsOpen,
+  currentSessionId,
+  onNewChat,
 }: SidebarProps) {
-  const [deletingSessionId, setDeletingSessionId] = useState<string | null>(null)
+  const [sessions, setSessions] = useState<ChatSession[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
-  const handleDeleteSession = (sessionId: string, e: React.MouseEvent) => {
+  const fetchSessions = useCallback(async () => {
+    setIsLoading(true)
+    try {
+      const fetchedSessions = await SessionManager.getAllSessions()
+      setSessions(fetchedSessions)
+    } catch (error) {
+      console.error("Failed to fetch sessions:", error)
+      // Optionally, show an error message to the user
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchSessions()
+  }, [fetchSessions])
+
+  const handleDeleteSession = async (sessionId: string, e: React.MouseEvent) => {
     e.stopPropagation()
-    onDeleteSession(sessionId)
-    setDeletingSessionId(null)
+    // Implement session deletion logic if required by your API
+    // e.g., await SessionManager.deleteSession(sessionId)
+    // After deletion, refetch sessions
+    await fetchSessions()
   }
   const handleNewChat = () => {
     router.push("/chat/new")
@@ -88,35 +102,40 @@ export default function Sidebar({
         <div className="flex-1 overflow-y-auto px-3">
           <div className="text-xs text-slate-400 mb-2 px-2">Recent Chats</div>
           <div className="space-y-1">
-            {sessions.length === 0 ? (
+            {isLoading ? (
+              <div className="text-xs text-slate-500 text-center py-4 px-2">
+                Loading chats...
+              </div>
+            ) : sessions.length === 0 ? (
               <div className="text-xs text-slate-500 text-center py-4 px-2">
                 No previous chats
               </div>
             ) : (
               sessions.map((session) => (
                 <div
-                  key={session.id}                  className={`group relative p-2 rounded-lg cursor-pointer transition-colors ${
-                    session.id === currentSessionId
+                  key={session.session_id}
+                  className={`group relative p-2 rounded-lg cursor-pointer transition-colors ${
+                    session.session_id === currentSessionId
                       ? "bg-blue-600/20 border border-blue-400/30"
                       : "hover:bg-slate-800/50"
                   }`}
-                  onClick={() => handleLoadSession(session.id)}
+                  onClick={() => handleLoadSession(session.session_id)}
                 >
                   <div className="flex items-start gap-2">
                     <MessageSquare className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <div className="text-sm text-white truncate mb-1">
-                        {session.title}
+                        {session.metadata?.name || "New Chat"}
                       </div>
                       <div className="text-xs text-slate-400 truncate">
-                        {session.lastMessage}
+                        {/* You might want to display the last message here if available */}
                       </div>
                       <div className="text-xs text-slate-500 mt-1">
-                        {formatDistanceToNow(session.timestamp, { addSuffix: true })}
+                        {formatDistanceToNow(new Date(session.created_at), { addSuffix: true })}
                       </div>
                     </div>
                     <button
-                      onClick={(e) => handleDeleteSession(session.id, e)}
+                      onClick={(e) => handleDeleteSession(session.session_id, e)}
                       className="opacity-0 group-hover:opacity-100 p-1 rounded hover:bg-red-500/20 transition-all"
                       title="Delete chat"
                     >

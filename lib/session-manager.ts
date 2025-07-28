@@ -17,35 +17,29 @@ export interface ZepSessionResponse {
 }
 
 export interface ChatSession {
-  id: string
-  title: string
-  lastMessage: string
-  timestamp: Date
-  messageCount: number
+  session_id: string
+  metadata?: { name?: string }
+  [key: string]: any // Allow other properties
 }
 
 // Removed direct API constants - now handled by API routes
 
 // Local storage keys
-const SESSIONS_STORAGE_KEY = "mutumwa_chat_sessions"
 const CURRENT_SESSION_KEY = "mutumwa_current_session"
 
 export class SessionManager {
-  // Get all stored sessions from local storage
-  static getAllSessions(): ChatSession[] {
-    if (typeof window === "undefined") return []
-    
+  // Get all stored sessions from Zep API
+  static async getAllSessions(): Promise<ChatSession[]> {
     try {
-      const stored = localStorage.getItem(SESSIONS_STORAGE_KEY)
-      if (!stored) return []
-      
-      const sessions = JSON.parse(stored)
-      return sessions.map((session: any) => ({
-        ...session,
-        timestamp: new Date(session.timestamp)
-      }))
+      const response = await fetch("/api/sessions")
+      if (!response.ok) {
+        console.error("Failed to fetch sessions:", response.statusText)
+        return []
+      }
+      const data = await response.json()
+      return data.sessions || []
     } catch (error) {
-      console.error("Error reading sessions from localStorage:", error)
+      console.error("Error fetching sessions:", error)
       return []
     }
   }
@@ -55,27 +49,26 @@ export class SessionManager {
     if (typeof window === "undefined") return
     
     try {
-      localStorage.setItem(SESSIONS_STORAGE_KEY, JSON.stringify(sessions))
+      localStorage.setItem("mutumwa_chat_sessions", JSON.stringify(sessions))
     } catch (error) {
       console.error("Error saving sessions to localStorage:", error)
     }
   }
 
   // Add or update a session
-  static saveSession(session: ChatSession): void {
+  static async saveSession(session: ChatSession): Promise<void> {
     console.log("Saving session:", session)
-    const sessions = this.getAllSessions()
-    const existingIndex = sessions.findIndex(s => s.id === session.id)
-    
-    if (existingIndex >= 0) {
-      sessions[existingIndex] = session
-    } else {
-      sessions.unshift(session) // Add to beginning
+    try {
+      await fetch("/api/sessions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(session),
+      })
+    } catch (error) {
+      console.error("Error saving session:", error)
     }
-    
-    // Keep only the latest 50 sessions
-    const limitedSessions = sessions.slice(0, 50)
-    this.saveSessions(limitedSessions)
   }
 
   // Get current session ID
@@ -110,17 +103,30 @@ export class SessionManager {
   }
 
   // Add a message to Zep session via our Next.js API route
-  static async addMessageToSession(sessionId: string, content: string, role: 'user' | 'assistant'): Promise<boolean> {
+  static async addMessageToSession(
+    sessionId: string,
+    content: string,
+    role: "user" | "assistant"
+  ): Promise<boolean> {
     try {
+      const messages = await this.fetchSessionMessages(sessionId)
+      if (messages.length === 0 && role === "user") {
+        // This is the first message, let's create the session with metadata
+        await this.saveSession({
+          session_id: sessionId,
+          metadata: { name: content.substring(0, 50) }, // Use first 50 chars as name
+        })
+      }
+
       const response = await fetch(`/api/sessions/${sessionId}/messages`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           role,
-          content
-        })
+          content,
+        }),
       })
 
       if (!response.ok) {
@@ -142,44 +148,4 @@ export class SessionManager {
     const title = firstMessage.trim().slice(0, 50)
     return title.length < firstMessage.trim().length ? `${title}...` : title
   }
-  // Update session with new message info
-  static updateSessionWithMessage(sessionId: string, message: string, isUser: boolean): void {
-    if (isUser) {
-      const sessions = this.getAllSessions()
-      const existingIndex = sessions.findIndex(s => s.id === sessionId)
-      
-      if (existingIndex >= 0) {
-        // Update existing session
-        sessions[existingIndex].lastMessage = message
-        sessions[existingIndex].timestamp = new Date()
-        sessions[existingIndex].messageCount += 1
-        this.saveSessions(sessions)
-      } else {
-        // Create new session
-        const newSession: ChatSession = {
-          id: sessionId,
-          title: this.generateSessionTitle(message),
-          lastMessage: message,
-          timestamp: new Date(),
-          messageCount: 1
-        }
-        this.saveSession(newSession)
-      }
-    }
-  }
-
-  // Delete a session
-  static deleteSession(sessionId: string): void {
-    const sessions = this.getAllSessions()
-    const filteredSessions = sessions.filter(s => s.id !== sessionId)
-    this.saveSessions(filteredSessions)
-  }
-
-  // Clear all sessions
-  static clearAllSessions(): void {
-    if (typeof window === "undefined") return
-    localStorage.removeItem(SESSIONS_STORAGE_KEY)
-    localStorage.removeItem(CURRENT_SESSION_KEY)
-  }
-
 }

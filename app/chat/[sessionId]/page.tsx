@@ -6,96 +6,49 @@ import { v4 as uuidv4 } from "uuid"
 import ChatMessages from "@/components/chat-messages"
 import ChatInput from "@/components/chat-input"
 import { getLanguageSuggestions } from "@/lib/suggestions"
-import { SessionManager } from "@/lib/session-manager"
+import { SessionManager, ZepMessage } from "@/lib/session-manager"
 import { useLanguage } from "../../contexts/LanguageContext"
-import { useApp } from "../../contexts/AppContext"
 
 type Message = {
   id: string
   text: string
-  sender: 'user' | 'assistant'
+  sender: "user" | "assistant"
   timestamp: Date
-}
-
-type Session = {
-  session_id: string
-  created_at?: string
-  updated_at?: string
-  metadata?: any
 }
 
 export default function ChatPage() {
   const params = useParams()
   const router = useRouter()
   const sessionId = params?.sessionId as string
-  
-  const { 
-    messages, 
-    setMessages, 
-    refreshSessions,
-    setCurrentSessionId 
-  } = useApp()
+
+  const [messages, setMessages] = useState<Message[]>([])
   const { selectedLanguage } = useLanguage()
-  
+
   const [isLoading, setIsLoading] = useState(false)
   const [isSessionLoaded, setIsSessionLoaded] = useState(false)
-  const [sessions, setSessions] = useState<Session[]>([])
-  const [isSessionsLoading, setIsSessionsLoading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  // Fetch all sessions for history sidebar
-  const fetchSessions = useCallback(async () => {
-    setIsSessionsLoading(true)
-    try {
-      const res = await fetch("/api/sessions")
-      if (!res.ok) throw new Error("Failed to fetch sessions")
-      const data = await res.json()
-      setSessions(data.sessions || data || [])
-    } catch (err) {
-      console.error('Error fetching sessions:', err)
-      setSessions([])
-    } finally {
-      setIsSessionsLoading(false)
-    }
-  }, [])
 
   // Load messages for a specific session
   const loadSessionMessages = useCallback(async (sessionId: string) => {
     if (!sessionId) return
-    
+
     setIsSessionLoaded(false)
     try {
-      const res = await fetch(`/api/sessions/${sessionId}/messages`)
-      if (!res.ok) {
-        if (res.status === 404) {
-          // New session, no messages yet
-          setMessages([])
-          setIsSessionLoaded(true)
-          setCurrentSessionId(sessionId)
-          return
-        }
-        throw new Error("Failed to fetch session messages")
-      }
-      
-      const data = await res.json()
-      
-      // Transform Zep messages to our format
-      const formattedMessages: Message[] = (data.messages || []).map((msg: any) => ({
+      const zepMessages = await SessionManager.fetchSessionMessages(sessionId)
+      const formattedMessages: Message[] = zepMessages.map((msg: ZepMessage) => ({
         id: msg.uuid || uuidv4(),
-        text: msg.content || msg.text,
-        sender: msg.role === 'user' ? 'user' : 'assistant',
-        timestamp: new Date(msg.created_at || msg.timestamp || Date.now())
+        text: msg.content,
+        sender: msg.role === "user" ? "user" : "assistant",
+        timestamp: new Date(msg.created_at),
       }))
-      
       setMessages(formattedMessages)
-      setCurrentSessionId(sessionId)
     } catch (err) {
-      console.error('Error loading session messages:', err)
+      console.error("Error loading session messages:", err)
       setMessages([])
     } finally {
       setIsSessionLoaded(true)
     }
-  }, [setMessages, setCurrentSessionId])
+  }, [])
 
   // Handle URL changes and session loading
   useEffect(() => {
@@ -107,19 +60,6 @@ export default function ChatPage() {
       router.replace(`/chat/${newSessionId}`)
     }
   }, [sessionId, loadSessionMessages, router])
-
-  // Fetch sessions list on component mount
-  useEffect(() => {
-    fetchSessions()
-  }, [fetchSessions])
-
-  // Handle clicking on a session in the sidebar
-  const handleSessionClick = async (clickedSessionId: string) => {
-    if (clickedSessionId === sessionId) return // Already on this session
-    
-    setSidebarOpen(false) // Close sidebar on mobile
-    router.push(`/chat/${clickedSessionId}`)
-  }
 
   // Handle creating a new chat
   const handleNewChat = () => {
@@ -142,14 +82,8 @@ export default function ChatPage() {
 
     setMessages((prev) => [...prev, userMessage])
 
-    // Update session storage and refresh sessions list
-    SessionManager.updateSessionWithMessage(sessionId, text, true)
-    refreshSessions()
-
-    // Add user message to Zep (async, don't wait for it)
-    SessionManager.addMessageToSession(sessionId, text, 'user').catch(error => {
-      console.warn('Failed to add user message to Zep:', error)
-    })
+    // Add user message to Zep
+    await SessionManager.addMessageToSession(sessionId, text, "user")
 
     setIsLoading(true)
 
@@ -159,9 +93,6 @@ export default function ChatPage() {
       formData.append("text", text)
       formData.append("targetLanguage", selectedLanguage.value)
       formData.append("sessionId", sessionId)
-
-      console.log("Sending request to webhook:", process.env.NEXT_PUBLIC_WEBHOOK_URL)
-      console.log("Request data:", { text, targetLanguage: selectedLanguage.value, sessionId })
 
       // Send request to the webhook
       const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_URL || "", {
@@ -185,14 +116,8 @@ export default function ChatPage() {
 
       setMessages((prev) => [...prev, assistantMessage])
 
-      // Add assistant message to Zep (async, don't wait for it)
-      SessionManager.addMessageToSession(sessionId, data.output, 'assistant').catch(error => {
-        console.warn('Failed to add assistant message to Zep:', error)
-      })
-      
-      // Refresh sessions to update the list with new activity
-      fetchSessions()
-      
+      // Add assistant message to Zep
+      await SessionManager.addMessageToSession(sessionId, data.output, "assistant")
     } catch (error) {
       console.error("Error sending message:", error)
 
@@ -209,13 +134,6 @@ export default function ChatPage() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  // Format session display name for sidebar
-  const getSessionDisplayName = (session: Session) => {
-    if (session.metadata?.title) return session.metadata.title
-    const date = new Date(session.created_at || session.updated_at || Date.now())
-    return `Chat ${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
   }
 
   // Loading skeleton component
