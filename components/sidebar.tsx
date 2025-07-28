@@ -108,9 +108,6 @@ export default function Sidebar({
                       <div className="text-sm text-white truncate mb-1">
                         {session.title}
                       </div>
-                      <div className="text-xs text-slate-400 truncate">
-                        {session.lastMessage}
-                      </div>
                       <div className="text-xs text-slate-500 mt-1">
                         {formatDistanceToNow(session.timestamp, { addSuffix: true })}
                       </div>

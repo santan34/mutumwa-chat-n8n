@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid"
 import ChatMessages from "@/components/chat-messages"
 import ChatInput from "@/components/chat-input"
 import { getLanguageSuggestions } from "@/lib/suggestions"
-import { SessionManager } from "@/lib/session-manager"
+import { SessionManager, ChatSession } from "@/lib/session-manager"
 import { useLanguage } from "../../contexts/LanguageContext"
 import { useApp } from "../../contexts/AppContext"
 
@@ -15,13 +15,6 @@ type Message = {
   text: string
   sender: 'user' | 'assistant'
   timestamp: Date
-}
-
-type Session = {
-  session_id: string
-  created_at?: string
-  updated_at?: string
-  metadata?: any
 }
 
 export default function ChatPage() {
@@ -39,7 +32,7 @@ export default function ChatPage() {
   
   const [isLoading, setIsLoading] = useState(false)
   const [isSessionLoaded, setIsSessionLoaded] = useState(false)
-  const [sessions, setSessions] = useState<Session[]>([])
+  const [sessions, setSessions] = useState<ChatSession[]>([])
   const [isSessionsLoading, setIsSessionsLoading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
@@ -47,10 +40,8 @@ export default function ChatPage() {
   const fetchSessions = useCallback(async () => {
     setIsSessionsLoading(true)
     try {
-      const res = await fetch("/api/sessions")
-      if (!res.ok) throw new Error("Failed to fetch sessions")
-      const data = await res.json()
-      setSessions(data.sessions || data || [])
+      const localSessions = SessionManager.getAllSessions()
+      setSessions(localSessions)
     } catch (err) {
       console.error('Error fetching sessions:', err)
       setSessions([])
@@ -143,7 +134,20 @@ export default function ChatPage() {
     setMessages((prev) => [...prev, userMessage])
 
     // Update session storage and refresh sessions list
-    SessionManager.updateSessionWithMessage(sessionId, text, true)
+    const sessions = SessionManager.getAllSessions()
+    const isNewSession = !sessions.find(s => s.id === sessionId)
+    if (isNewSession) {
+      const newSession: ChatSession = {
+        id: sessionId,
+        title: SessionManager.generateSessionTitle(text),
+        lastMessage: text,
+        timestamp: new Date(),
+        messageCount: 1
+      }
+      SessionManager.saveSession(newSession)
+    } else {
+      SessionManager.updateSessionWithMessage(sessionId, text, true)
+    }
     refreshSessions()
 
     // Add user message to Zep (async, don't wait for it)
@@ -209,13 +213,6 @@ export default function ChatPage() {
     } finally {
       setIsLoading(false)
     }
-  }
-
-  // Format session display name for sidebar
-  const getSessionDisplayName = (session: Session) => {
-    if (session.metadata?.title) return session.metadata.title
-    const date = new Date(session.created_at || session.updated_at || Date.now())
-    return `Chat ${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
   }
 
   // Loading skeleton component
