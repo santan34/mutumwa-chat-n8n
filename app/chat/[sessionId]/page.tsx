@@ -52,49 +52,53 @@ export default function ChatPage() {
 
   // Handle URL changes and session loading
   useEffect(() => {
-    if (sessionId) {
+    if (sessionId === "new") {
+      // Don't load messages, this is a new chat
+      setMessages([])
+      setIsSessionLoaded(true)
+    } else if (sessionId) {
       loadSessionMessages(sessionId)
-    } else {
-      // If no sessionId in URL, create a new session
-      const newSessionId = uuidv4()
-      router.replace(`/chat/${newSessionId}`)
     }
-  }, [sessionId, loadSessionMessages, router])
+  }, [sessionId, loadSessionMessages])
 
   // Handle creating a new chat
   const handleNewChat = () => {
-    const newSessionId = uuidv4()
     setSidebarOpen(false)
-    router.push(`/chat/${newSessionId}`)
+    router.push(`/chat/new`)
   }
 
   // Send message handler
   const handleSendMessage = async (text: string) => {
-    if (!text.trim() || !sessionId) return
+    if (!text.trim()) return
 
-    // Add user message immediately to UI
+    const currentSessionId = sessionId === "new" ? uuidv4() : sessionId
+    if (sessionId === "new") {
+      router.replace(`/chat/${currentSessionId}`)
+    }
+
     const userMessage: Message = {
       id: uuidv4(),
       text: text.trim(),
       sender: "user",
       timestamp: new Date(),
     }
-
     setMessages((prev) => [...prev, userMessage])
-
-    // Add user message to Zep
-    await SessionManager.addMessageToSession(sessionId, text, "user")
 
     setIsLoading(true)
 
     try {
-      // Create form data for the webhook request
+      await SessionManager.addMessageToSession(
+        currentSessionId,
+        text,
+        "user",
+        messages.length === 0 // isFirstMessage
+      )
+
       const formData = new FormData()
       formData.append("text", text)
       formData.append("targetLanguage", selectedLanguage.value)
-      formData.append("sessionId", sessionId)
+      formData.append("sessionId", currentSessionId)
 
-      // Send request to the webhook
       const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_URL || "", {
         method: "POST",
         body: formData,
@@ -106,22 +110,21 @@ export default function ChatPage() {
 
       const data = await response.json()
 
-      // Add assistant response to UI
       const assistantMessage: Message = {
         id: uuidv4(),
         text: data.output,
         sender: "assistant",
         timestamp: new Date(),
       }
-
       setMessages((prev) => [...prev, assistantMessage])
 
-      // Add assistant message to Zep
-      await SessionManager.addMessageToSession(sessionId, data.output, "assistant")
+      await SessionManager.addMessageToSession(
+        currentSessionId,
+        data.output,
+        "assistant"
+      )
     } catch (error) {
       console.error("Error sending message:", error)
-
-      // Add error message to UI
       setMessages((prev) => [
         ...prev,
         {

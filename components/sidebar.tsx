@@ -50,7 +50,6 @@ export default function Sidebar({
   }
   const handleNewChat = () => {
     router.push("/chat/new")
-    // Only close sidebar on mobile after navigation
     if (window.innerWidth < 768) {
       setIsOpen(false)
     }
@@ -58,11 +57,23 @@ export default function Sidebar({
 
   const handleLoadSession = (sessionId: string) => {
     router.push(`/chat/${sessionId}`)
-    // Only close sidebar on mobile after navigation
     if (window.innerWidth < 768) {
       setIsOpen(false)
     }
   }
+
+  // Effect to refetch sessions when a new chat is created
+  useEffect(() => {
+    const handleRouteChange = (url: string) => {
+      if (url.startsWith("/chat/")) {
+        fetchSessions()
+      }
+    }
+
+    // In a real app, you'd listen to router events.
+    // For this example, we'll refetch on component mount and when currentSessionId changes.
+    fetchSessions()
+  }, [currentSessionId, fetchSessions])
   return (
     <>
       {/* Mobile overlay */}

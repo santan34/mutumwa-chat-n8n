@@ -26,12 +26,15 @@ export interface ChatSession {
 
 // Local storage keys
 const CURRENT_SESSION_KEY = "mutumwa_current_session"
+const HARDCODED_USER_ID = "hardcoded_user_id" // Replace with your actual user ID
 
 export class SessionManager {
   // Get all stored sessions from Zep API
   static async getAllSessions(): Promise<ChatSession[]> {
     try {
-      const response = await fetch("/api/sessions")
+      const response = await fetch(
+        `/api/sessions?userId=${HARDCODED_USER_ID}`
+      )
       if (!response.ok) {
         console.error("Failed to fetch sessions:", response.statusText)
         return []
