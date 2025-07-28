@@ -33,31 +33,14 @@ export default function ChatPage() {
     messages, 
     setMessages, 
     refreshSessions,
-    setCurrentSessionId 
+    setCurrentSessionId,
+    sessions,
   } = useApp()
   const { selectedLanguage } = useLanguage()
   
   const [isLoading, setIsLoading] = useState(false)
   const [isSessionLoaded, setIsSessionLoaded] = useState(false)
-  const [sessions, setSessions] = useState<Session[]>([])
-  const [isSessionsLoading, setIsSessionsLoading] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-
-  // Fetch all sessions for history sidebar
-  const fetchSessions = useCallback(async () => {
-    setIsSessionsLoading(true)
-    try {
-      const res = await fetch("/api/sessions")
-      if (!res.ok) throw new Error("Failed to fetch sessions")
-      const data = await res.json()
-      setSessions(data.sessions || data || [])
-    } catch (err) {
-      console.error('Error fetching sessions:', err)
-      setSessions([])
-    } finally {
-      setIsSessionsLoading(false)
-    }
-  }, [])
 
   // Load messages for a specific session
   const loadSessionMessages = useCallback(async (sessionId: string) => {
@@ -108,10 +91,6 @@ export default function ChatPage() {
     }
   }, [sessionId, loadSessionMessages, router])
 
-  // Fetch sessions list on component mount
-  useEffect(() => {
-    fetchSessions()
-  }, [fetchSessions])
 
   // Handle clicking on a session in the sidebar
   const handleSessionClick = async (clickedSessionId: string) => {
@@ -191,7 +170,7 @@ export default function ChatPage() {
       })
       
       // Refresh sessions to update the list with new activity
-      fetchSessions()
+      refreshSessions()
       
     } catch (error) {
       console.error("Error sending message:", error)

@@ -43,6 +43,8 @@ function Header() {
               src="/mutumwa-nobg-high-res.png"
               alt="Mutumwa AI Logo"
               fill
+              priority
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-contain"
             />
           </div>
@@ -76,7 +78,7 @@ function Header() {
 
 function AppLayout({ children }: { children: ReactNode }) {
   const { isSidebarOpen, setIsSidebarOpen } = useSidebar()
-  const { sessions, currentSessionId, loadSession, deleteSession } = useApp()
+  const { sessions, currentSessionId, loadSession, deleteSession, refreshSessions } = useApp()
   const pathname = usePathname()
 
   // Check if we're on a chat route

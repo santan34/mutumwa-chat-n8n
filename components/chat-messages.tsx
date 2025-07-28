@@ -59,8 +59,8 @@ export default function ChatMessages({
   return (
     <div className="flex-1 overflow-y-auto overscroll-none h-full pb-4 pt-14 px-2 md:p-4 lg:p-8">
       <div className="max-w-3xl mx-auto w-full relative">
-        {messages.map((message) => (
-          <div key={message.id} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} mb-4`}>
+        {messages.map((message, index) => (
+          <div key={`${message.id}-${index}`} className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"} mb-4`}>
             <div
               className={`max-w-[85%] md:max-w-[80%] lg:max-w-[70%] rounded-2xl px-3 py-2 md:px-4 md:py-3 ${
                 message.sender === "user"
