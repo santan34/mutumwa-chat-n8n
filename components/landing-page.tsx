@@ -104,7 +104,13 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
           <div className="flex items-center space-x-6">
             <a href="#" className="text-white hover:text-gray-300 transition-colors text-sm">Contact sales</a>
             <a href="#" className="text-white hover:text-gray-300 transition-colors text-sm">Sign in</a>
-            <a href="#" className="text-white hover:text-gray-300 transition-colors text-sm">View demo</a>
+            <Button
+              onClick={onGetStarted}
+              className="text-white hover:text-gray-300 transition-colors text-sm"
+              variant="link"
+            >
+              View demo
+            </Button>
             <Button 
               onClick={onGetStarted}
               className="bg-black text-white hover:bg-gray-800 px-4 py-2 rounded transition-colors"
@@ -159,6 +165,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
               
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button 
+                  onClick={onGetStarted}
                   variant="outline"
                   size="lg"
                   className="border-white text-white hover:bg-white hover:text-black px-6 py-3 rounded transition-colors"
