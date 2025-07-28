@@ -1,154 +1,146 @@
-// Route to fetch all sessions (conversation history)
-export async function GET_ALL_SESSIONS(request: NextRequest) {
-  try {
-    const response = await fetch(`${ZEP_API_BASE}/sessions`, {
-      headers: {
-        'Authorization': `Api-Key ${ZEP_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    })
+import { NextRequest, NextResponse } from 'next/server';
+import { Message, Session } from '@/lib/types';
 
-    if (!response.ok) {
-      throw new Error(`Zep API error: ${response.status} ${response.statusText}`)
+const ZEP_API_BASE = process.env.ZEP_API_BASE || "https://api.getzep.com/api/v2";
+const ZEP_API_KEY = process.env.ZEP_API_KEY;
+const USER_ID = "hardcoded_user_id";
+
+async function getSession(sessionId: string): Promise<Session | null> {
+    if (!ZEP_API_KEY) {
+        console.error("ZEP_API_KEY is not set");
+        return null;
     }
-
-    const data = await response.json()
-    return NextResponse.json(data)
-  } catch (error) {
-    console.error('Error fetching sessions:', error)
-    return NextResponse.json({ sessions: [] })
-  }
+    try {
+        const response = await fetch(`${ZEP_API_BASE}/sessions/${sessionId}`, {
+            headers: {
+                'Authorization': `Api-Key ${ZEP_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        if (response.status === 404) {
+            return null;
+        }
+        if (!response.ok) {
+            console.error(`Zep API error (getSession): ${response.status} ${response.statusText}`);
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error fetching session:', error);
+        return null;
+    }
 }
 
-// Route to fetch a particular session's details
-export async function GET_SESSION(request: NextRequest, { params }: { params: { sessionId: string } }) {
-  try {
-    const { sessionId } = params
-
-    if (!sessionId) {
-      return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
-      )
+async function createSession(sessionId: string, firstMessage: string): Promise<Session | null> {
+    if (!ZEP_API_KEY) {
+        console.error("ZEP_API_KEY is not set");
+        return null;
     }
-
-    const response = await fetch(`${ZEP_API_BASE}/sessions/${sessionId}`, {
-      headers: {
-        'Authorization': `Api-Key ${ZEP_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        return NextResponse.json({ error: 'Session not found' }, { status: 404 })
-      }
-      throw new Error(`Zep API error: ${response.status} ${response.statusText}`)
+    try {
+        const response = await fetch(`${ZEP_API_BASE}/sessions`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Api-Key ${ZEP_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                session_id: sessionId,
+                user_id: USER_ID,
+                metadata: { name: firstMessage.slice(0, 50) }
+            })
+        });
+        if (!response.ok) {
+            console.error(`Zep API error (createSession): ${response.status} ${response.statusText}`);
+            return null;
+        }
+        return await response.json();
+    } catch (error) {
+        console.error('Error creating session:', error);
+        return null;
     }
-
-    const data = await response.json()
-    return NextResponse.json(data)
-  } catch (error) {
-    console.error('Error fetching session details:', error)
-    return NextResponse.json({ error: 'Failed to fetch session details' }, { status: 500 })
-  }
 }
-import { NextRequest, NextResponse } from 'next/server'
-
-const ZEP_API_BASE = process.env.ZEP_API_BASE || "https://api.getzep.com/api/v2"
-const ZEP_API_KEY = process.env.ZEP_API_KEY || "z_1dWlkIjoiNTI3OGYyZDAtZDc2Ny00ZDk4LTgyNzItNmJjZTY4ZGZkYmY5In0.pq9UvrIRaLs-YQzmby2GBBcA1x631J-7Z2DpUrN0tlgeVO0w79bPQlOZcluMSIJMhxf5HF5Ze155An0S83I6sw"
 
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { sessionId: string } }
+    request: NextRequest,
+    { params }: { params: { sessionId: string } }
 ) {
-  try {
-    const { sessionId } = params
-
+    const { sessionId } = params;
     if (!sessionId) {
-      return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
-      )
+        return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
     }
 
-    const response = await fetch(`${ZEP_API_BASE}/sessions/${sessionId}/messages`, {
-      headers: {
-        'Authorization': `Api-Key ${ZEP_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    })
-
-    if (!response.ok) {
-      if (response.status === 404) {
-        // Session not found, return empty messages
-        return NextResponse.json({
-          messages: [],
-          total_count: 0,
-          row_count: 0
-        })
-      }
-      
-      throw new Error(`Zep API error: ${response.status} ${response.statusText}`)
+    if (!ZEP_API_KEY) {
+        return NextResponse.json({ error: 'ZEP_API_KEY is not configured' }, { status: 500 });
     }
 
-    const data = await response.json()
-    return NextResponse.json(data)
+    try {
+        const response = await fetch(`${ZEP_API_BASE}/sessions/${sessionId}/messages`, {
+            headers: {
+                'Authorization': `Api-Key ${ZEP_API_KEY}`,
+                'Content-Type': 'application/json'
+            }
+        });
 
-  } catch (error) {
-    console.error('Error fetching session messages:', error)
-    
-    // Return empty messages instead of error to prevent app crashes
-    return NextResponse.json({
-      messages: [],
-      total_count: 0,
-      row_count: 0
-    })
-  }
+        if (!response.ok) {
+            if (response.status === 404) {
+                return NextResponse.json({ messages: [], total_count: 0, row_count: 0 });
+            }
+            throw new Error(`Zep API error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
+    } catch (error) {
+        console.error('Error fetching session messages:', error);
+        return NextResponse.json({ messages: [], total_count: 0, row_count: 0 });
+    }
 }
 
 export async function POST(
-  request: NextRequest,
-  { params }: { params: { sessionId: string } }
+    request: NextRequest,
+    { params }: { params: { sessionId: string } }
 ) {
-  try {
-    const { sessionId } = params
-    const body = await request.json()
-
+    const { sessionId } = params;
     if (!sessionId) {
-      return NextResponse.json(
-        { error: 'Session ID is required' },
-        { status: 400 }
-      )
+        return NextResponse.json({ error: 'Session ID is required' }, { status: 400 });
     }
 
-    const response = await fetch(`${ZEP_API_BASE}/sessions/${sessionId}/messages`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Api-Key ${ZEP_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error(`Zep API error: ${response.status} ${response.statusText}`, errorText)
-      
-      return NextResponse.json(
-        { error: `Failed to add message: ${response.statusText}` },
-        { status: response.status }
-      )
+    if (!ZEP_API_KEY) {
+        return NextResponse.json({ error: 'ZEP_API_KEY is not configured' }, { status: 500 });
     }
 
-    const data = await response.json()
-    return NextResponse.json(data)
+    try {
+        const body = await request.json();
+        const messages: Omit<Message, 'uuid' | 'created_at'>[] = body.messages;
 
-  } catch (error) {
-    console.error('Error adding message to session:', error)
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    )
-  }
+        if (!messages || !Array.isArray(messages) || messages.length === 0) {
+            return NextResponse.json({ error: 'Messages are required' }, { status: 400 });
+        }
+
+        const session = await getSession(sessionId);
+        if (!session) {
+            await createSession(sessionId, messages[0].content);
+        }
+
+        const response = await fetch(`${ZEP_API_BASE}/sessions/${sessionId}/messages`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Api-Key ${ZEP_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ messages })
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error(`Zep API error: ${response.status} ${response.statusText}`, errorText);
+            return NextResponse.json({ error: `Failed to add message: ${response.statusText}` }, { status: response.status });
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
+    } catch (error) {
+        console.error('Error adding message to session:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
 }
