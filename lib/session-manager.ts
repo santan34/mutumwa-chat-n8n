@@ -11,7 +11,7 @@ export interface ZepMessage {
 }
 
 export interface ZepSessionResponse {
-  messages: ZepMessage[]
+  sessions: ChatSession[]
   total_count: number
   row_count: number
 }
@@ -22,6 +22,9 @@ export interface ChatSession {
   lastMessage: string
   timestamp: Date
   messageCount: number
+  metadata?: {
+    [key: string]: any
+  }
 }
 
 // Removed direct API constants - now handled by API routes
@@ -88,6 +91,26 @@ export class SessionManager {
   static setCurrentSessionId(sessionId: string): void {
     if (typeof window === "undefined") return
     localStorage.setItem(CURRENT_SESSION_KEY, sessionId)
+  }
+
+  // Fetch all sessions from Zep API via our Next.js API route
+  static async fetchAllSessions(): Promise<ChatSession[]> {
+    try {
+      const response = await fetch('/api/sessions')
+
+      if (!response.ok) {
+        console.warn(`Failed to fetch sessions: ${response.statusText}`)
+        return []
+      }
+
+      const data: ZepSessionResponse = await response.json()
+      console.log("Fetched sessions:", data.sessions)
+      // Convert Zep sessions to our format
+      return data.sessions || []
+    } catch (error) {
+      console.error("Error fetching sessions:", error)
+      return []
+    }
   }
   // Fetch messages from Zep API via our Next.js API route
   static async fetchSessionMessages(sessionId: string): Promise<ZepMessage[]> {
@@ -161,7 +184,10 @@ export class SessionManager {
           title: this.generateSessionTitle(message),
           lastMessage: message,
           timestamp: new Date(),
-          messageCount: 1
+          messageCount: 1,
+          metadata: {
+            first_message: message
+          }
         }
         this.saveSession(newSession)
       }

@@ -34,14 +34,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([])
   const [currentSessionId, setCurrentSessionId] = useState("")
   const [sessions, setSessions] = useState<ChatSession[]>([])
-  // Load sessions from localStorage on mount
+  // Load sessions from API on mount
   useEffect(() => {
-    const storedSessions = SessionManager.getAllSessions()
-    console.log("Loading sessions from localStorage:", storedSessions)
-    setSessions(storedSessions)
-    
-    // Create test sessions if none exist (for debugging)
-   
+    const loadSessions = async () => {
+      const apiSessions = await SessionManager.fetchAllSessions()
+      console.log("Loading sessions from API:", apiSessions)
+      setSessions(apiSessions)
+    }
+    loadSessions()
     
     // Generate initial session ID
     const existingSessionId = SessionManager.getCurrentSessionId()
