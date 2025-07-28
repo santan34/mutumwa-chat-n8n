@@ -2,16 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const ZEP_API_BASE = process.env.ZEP_API_BASE || "https://api.getzep.com/api/v2"
 const ZEP_API_KEY = process.env.ZEP_API_KEY || "z_1dWlkIjoiNTI3OGYyZDAtZDc2Ny00ZDk4LTgyNzItNmJjZTY4ZGZkYmY5In0.pq9UvrIRaLs-YQzmby2GBBcA1x631J-7Z2DpUrN0tlgeVO0w79bPQlOZcluMSIJMhxf5HF5Ze155An0S83I6sw"
+const HARDCODED_USER_ID = "hardcoded_user_id" // Replace with your actual user ID
 
-// Route to fetch all sessions (conversation history)
+// Route to fetch all sessions for a user
 export async function GET(request: NextRequest) {
   try {
-    const response = await fetch(`${ZEP_API_BASE}/sessions`, {
-      headers: {
-        'Authorization': `Api-Key ${ZEP_API_KEY}`,
-        'Content-Type': 'application/json'
+    const response = await fetch(
+      `${ZEP_API_BASE}/sessions?userId=${HARDCODED_USER_ID}`,
+      {
+        headers: {
+          'Authorization': `Api-Key ${ZEP_API_KEY}`,
+          'Content-Type': 'application/json'
+        },
       }
-    })
+    )
 
     if (!response.ok) {
       throw new Error(`Zep API error: ${response.status} ${response.statusText}`)
@@ -44,7 +48,11 @@ export async function POST(request: NextRequest) {
         'Authorization': `Api-Key ${ZEP_API_KEY}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ session_id, metadata }),
+      body: JSON.stringify({
+        session_id,
+        metadata,
+        user_id: HARDCODED_USER_ID,
+      }),
     })
 
     if (!response.ok) {
