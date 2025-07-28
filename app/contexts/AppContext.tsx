@@ -19,12 +19,8 @@ type AppContextType = {
   currentSessionId: string
   setCurrentSessionId: (sessionId: string) => void
   sessions: ChatSession[]
-  resetApp: () => void
   startNewChat: () => void
   loadSession: (sessionId: string) => Promise<void>
-  loadSessionFromUrl: (sessionId: string) => Promise<void>
-  deleteSession: (sessionId: string) => void
-  refreshSessions: () => void
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined)
@@ -40,41 +36,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const apiSessions = await SessionManager.fetchAllSessions()
       console.log("Loading sessions from API:", apiSessions)
       setSessions(apiSessions)
+      if (apiSessions.length > 0) {
+        setCurrentSessionId(apiSessions[0].id)
+      }
     }
     loadSessions()
-    
-    // Generate initial session ID
-    const existingSessionId = SessionManager.getCurrentSessionId()
-    if (existingSessionId) {
-      setCurrentSessionId(existingSessionId)
-      console.log("Using existing session ID:", existingSessionId)
-    } else {
-      const newSessionId = uuidv4()
-      setCurrentSessionId(newSessionId)
-      SessionManager.setCurrentSessionId(newSessionId)
-      console.log("Created new session ID:", newSessionId)
-    }
-  }, [])
-  const resetApp = useCallback(() => {
-    setShowLanding(true)
-    setMessages([])
-    const newSessionId = uuidv4()
-    setCurrentSessionId(newSessionId)
-    SessionManager.setCurrentSessionId(newSessionId)
   }, [])
 
-  const startNewChat = useCallback(() => {
+  const startNewChat = useCallback(async () => {
     setMessages([])
     const newSessionId = uuidv4()
-    setCurrentSessionId(newSessionId)
-    SessionManager.setCurrentSessionId(newSessionId)
-    // Don't reset showLanding when starting a new chat
-  }, [])
+    const newSession = await SessionManager.createSession(newSessionId)
+    if (newSession) {
+      setCurrentSessionId(newSession.id)
+      setSessions([newSession, ...sessions])
+    }
+  }, [sessions])
 
   const loadSession = useCallback(async (sessionId: string) => {
     try {
       setCurrentSessionId(sessionId)
-      SessionManager.setCurrentSessionId(sessionId)
       setShowLanding(false)
       
       // Fetch messages from Zep API via our API route
@@ -95,54 +76,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setMessages([])
     }
   }, [])
-
-  const loadSessionFromUrl = useCallback(async (sessionId: string) => {
-    try {
-      console.log("Loading session from URL:", sessionId)
-      setCurrentSessionId(sessionId)
-      SessionManager.setCurrentSessionId(sessionId)
-      setShowLanding(false)
-      
-      // Fetch messages from Zep API via our API route
-      const zepMessages = await SessionManager.fetchSessionMessages(sessionId)
-      
-      // Convert Zep messages to app messages
-      const convertedMessages: Message[] = zepMessages.map((zepMsg) => ({
-        id: zepMsg.uuid,
-        text: zepMsg.content,
-        sender: zepMsg.role_type,
-        timestamp: new Date(zepMsg.created_at)
-      }))
-      
-      setMessages(convertedMessages)
-      
-      // If no messages found but session exists in local storage, it might be a new session
-      if (convertedMessages.length === 0) {
-        console.log("No messages found for session, starting fresh")
-        setMessages([])
-      }
-    } catch (error) {
-      console.error("Error loading session from URL:", error)
-      // Don't throw error, just start with empty messages
-      setMessages([])
-    }
-  }, [])
-  const deleteSession = useCallback((sessionId: string) => {
-    SessionManager.deleteSession(sessionId)
-    const updatedSessions = SessionManager.getAllSessions()
-    setSessions(updatedSessions)
-    
-    // If deleting current session, start a new one
-    if (sessionId === currentSessionId) {
-      startNewChat()
-    }
-  }, [currentSessionId, startNewChat])
-
-  const refreshSessions = useCallback(() => {
-    const storedSessions = SessionManager.getAllSessions()
-    console.log("Refreshing sessions:", storedSessions)
-    setSessions(storedSessions)
-  }, [])
   return (
     <AppContext.Provider value={{ 
       showLanding, 
@@ -152,12 +85,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       currentSessionId,
       setCurrentSessionId,
       sessions,
-      resetApp, 
       startNewChat,
       loadSession,
-      loadSessionFromUrl,
-      deleteSession,
-      refreshSessions
     }}>
       {children}
     </AppContext.Provider>
